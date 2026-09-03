@@ -15,8 +15,7 @@ import {
   DollarSign, 
   VideoOff, 
   PhoneCall,
-  Upload,
-  Key
+  Upload
 } from 'lucide-react';
 import { analyzeOfferWithAI, AnalysisResult } from './analyzer';
 import { extractTextFromPDF } from './pdfExtractor';
@@ -30,8 +29,6 @@ export default function App() {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [checklistState, setChecklistState] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
-  const [customApiKey, setCustomApiKey] = useState<string>('');
-  const [showApiInput, setShowApiInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync dark class on root
@@ -49,7 +46,7 @@ export default function App() {
 
     setIsAnalyzing(true);
     try {
-      const res = await analyzeOfferWithAI(query, customApiKey);
+      const res = await analyzeOfferWithAI(query);
       setResult(res);
       setChecklistState({ 1: false, 2: false, 3: false });
     } catch (err) {
@@ -169,16 +166,15 @@ export default function App() {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setShowApiInput(!showApiInput)}
-              className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition ${
+              onClick={() => alert("College Placement Cell & TPO advisory: Always report suspicious recruiters claiming fees to tpo@college.edu or National Cyber Helpline 1930.")}
+              className={`hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition ${
                 isDark 
                   ? 'border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-slate-300' 
                   : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700'
               }`}
-              title="Configure Custom AI Key (Optional)"
             >
-              <Key className="w-3.5 h-3.5 text-indigo-400" />
-              <span>AI API</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              College Safety Shield
             </button>
 
             <button
@@ -196,24 +192,6 @@ export default function App() {
           </div>
         </div>
       </header>
-
-      {/* Optional AI Key Bar */}
-      {showApiInput && (
-        <div className={`border-b px-4 py-2 text-xs flex items-center justify-center gap-2 ${
-          isDark ? 'bg-slate-900/90 border-slate-800 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-        }`}>
-          <span>Gemini API Key (Optional):</span>
-          <input
-            type="password"
-            placeholder="Paste AI API key or leave blank to use Built-in Engine..."
-            value={customApiKey}
-            onChange={(e) => setCustomApiKey(e.target.value)}
-            className={`px-3 py-1 rounded-md text-xs border w-72 focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
-              isDark ? 'bg-black border-slate-700 text-slate-200' : 'bg-white border-slate-300 text-slate-800'
-            }`}
-          />
-        </div>
-      )}
 
       {/* Main Container */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
