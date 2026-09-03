@@ -106,55 +106,53 @@ Return ONLY a valid JSON object with NO markdown formatting matching this exact 
 export function analyzeOfferLocally(text: string): AnalysisResult {
   const lower = text.toLowerCase();
 
-  // 1. Fee detection — strongest scam signal
-  const feeActionWords = /(?:pay|deposit|transfer|send)\s*(?:₹|rs|inr|\$|\d)|registration\s+fee|security\s+deposit|laptop\s+(?:charge|deposit|fee)|processing\s+fee|upi|paytm|gpay|bank\s+transfer\s+(?:₹|rs|to)/i.test(text);
-  const feeContextWords = /you\s+(?:need|have|must|are\s+required)\s+to\s+pay|kindly\s+(?:pay|deposit|transfer)/i.test(text);
-  const mentionsZeroFee = /never\s+solicits?\s+registration|never\s+charges?|no\s+fees?|free\s+of\s+(?:cost|charge)|does\s+not\s+(?:charge|collect)/i.test(text);
-  const feeDetected = (feeActionWords || feeContextWords) && !mentionsZeroFee;
+  // 1. Fee detection — Absolute scam dealbreaker
+  const mentionsZeroFee = /never\s+solicits?\s+registration|never\s+charges?|no\s+fees?|does\s+not\s+charge\s+(?:any\s+)?fee|free\s+of\s+(?:cost|charge)|does\s+not\s+(?:charge|collect)\s+any/i.test(text);
 
-  let feeAmountMatch = text.match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i);
+  const feePatterns = [
+    /(?:registration|processing|training|laptop|equipment|security|caution|onboarding|verification|document|seat|gate\s*pass)\s*(?:fee|fees|charge|charges|deposit|amount|cost)/i,
+    /(?:refundable|security|caution)\s*(?:deposit|amount|fee)/i,
+    /(?:kindly|please|must|required\s+to|need\s+to|have\s+to)\s*(?:pay|deposit|transfer|remit|send)\s*(?:an?\s+amount\s+of\s+)?(?:₹|rs\.?|inr|\$|\d+)/i,
+    /(?:fee|charge|deposit|cost)\s*(?:of\s+)?(?:₹|rs\.?|inr|\$|\d+)/i,
+    /(?:upi|gpay|paytm|phonepe|google\s*pay)\s*(?:to|id|transfer|qr|number|\:|\d)/i,
+    /(?:bank\s+transfer|transfer\s+amount)\s*(?:to\s+account|₹|rs|inr)/i,
+    /pay\s+(?:₹|rs\.?|inr|\$)\s*[\d,]+/i,
+    /(?:deposit|transfer|pay)\s+[\d,]+\s*(?:₹|rs|inr|rupees)/i
+  ];
+
+  let feeDetected = false;
+  if (!mentionsZeroFee) {
+    for (const pat of feePatterns) {
+      if (pat.test(text)) {
+        feeDetected = true;
+        break;
+      }
+    }
+  }
+
+  let feeAmountMatch = text.match(/(?:₹|rs\.?|inr|\$)\s*([\d,]+)/i) || text.match(/([\d,]+)\s*(?:₹|rs|inr|rupees)/i);
 
   // 2. Communication channel detection
-  const hasTelegram = /telegram|t\.me\//i.test(text);
-  const hasGmail = /@(?:gmail|yahoo|outlook|hotmail|rediffmail|protonmail)\.com/i.test(text);
+  const hasTelegram = /telegram|t\.me\/|@\w+direct/i.test(text);
   const hasOfficialDomain = /@(?:tcs|cloudscale|microsoft|infosys|google|amazon|accenture|wipro|ibm|zoho|flipkart|deloitte|cognizant|capgemini|hcl|tech\s?mahindra|lti|mindtree)\.(?:com|in|ai|io)|nextstep\.tcs\.com/i.test(text);
+  
+  // Recruiter public webmail impersonation
+  const recruiterGmail = /(?:from|contact|write\s+to|reach\s+us|hr|recruiter|email\s*:|send\s+to)\s*[:\-]?\s*[\w\.\-]+@(gmail|yahoo|outlook|hotmail|rediffmail)\.com/i.test(text)
+    || (/@(?:gmail|yahoo|outlook|hotmail)\.com/i.test(text) && /(?:tata|tcs|infosys|wipro|google|microsoft|amazon|accenture|cognizant)/i.test(text) && !hasOfficialDomain);
 
   // 3. Interview detection
-  const noInterviewExplicit = /without\s+(?:any\s+)?(?:technical\s+)?interview|no\s+(?:technical\s+)?interview|direct(?:ly)?\s+select/i.test(text);
+  const noInterviewExplicit = /without\s+(?:any\s+)?(?:technical\s+)?interview|no\s+(?:technical\s+)?interview|direct(?:ly)?\s+select(?:ed)?\s+based\s+on\s+resume/i.test(text);
   const interviewConducted = /technical\s+interview|aptitude\s+test|assessment|coding\s+(?:round|test|challenge)|interview\s+(?:round|panel|process)|hackathon|evaluated|shortlisted\s+(?:based|after|through)|campus\s+(?:drive|placement|recruitment)|appeared\s+for|clearing\s+the/i.test(text);
 
   // 4. Urgency pressure
   const hasUrgency = /urgent|within\s+\d+\s+hours?|today\s+only|immediate(?:ly)?|last\s+date.*today|respond\s+(?:now|immediately|asap)/i.test(text);
 
-  // 5. Legitimacy signals — things that REAL offers have
-  const hasCompanyLetterhead = /offer\s+letter|letter\s+of\s+(?:intent|appointment)|congratulations|we\s+are\s+(?:pleased|happy)\s+to\s+(?:offer|inform|confirm)|this\s+is\s+to\s+(?:inform|certify|confirm)/i.test(text);
-  const hasStructuredTerms = /stipend|ctc|compensation|probation|notice\s+period|reporting\s+(?:date|manager|location)|joining\s+date|terms\s+and\s+conditions|code\s+of\s+conduct/i.test(text);
-  const hasHRSignature = /human\s+resources|hr\s+(?:department|manager|team)|talent\s+acquisition|regards|sincerely|authorized\s+signatory/i.test(text);
+  // === STRICT FRAUD DETERMINATION ===
+  // In corporate recruitment fraud, asking an intern/applicant for money or using Telegram is an instant scam.
+  const isScam = feeDetected || hasTelegram || recruiterGmail || noInterviewExplicit || (hasUrgency && feeDetected);
 
-  // === WEIGHTED SCORING ===
-  // Strong scam signals (each alone = scam)
-  let scamScore = 0;
-  if (feeDetected) scamScore += 3;           // Asking for money = definite scam
-  if (hasTelegram) scamScore += 3;           // Telegram redirect = definite scam
-  if (noInterviewExplicit) scamScore += 2;   // "Selected without interview" = very suspicious
-
-  // Weak signals (only matter in combination)
-  if (hasGmail && !hasOfficialDomain) scamScore += 1;
-  if (hasUrgency) scamScore += 1;
-
-  // Legitimacy signals reduce score
-  if (hasCompanyLetterhead) scamScore -= 1;
-  if (hasStructuredTerms) scamScore -= 1;
-  if (hasHRSignature) scamScore -= 1;
-  if (hasOfficialDomain) scamScore -= 1;
-  if (interviewConducted) scamScore -= 1;
-
-  // Threshold: score >= 2 = SCAM
-  const isScam = scamScore >= 2;
-
-  // Derive per-fact flags for display
-  const emailSuspicious = isScam && (hasTelegram || (hasGmail && !hasOfficialDomain));
-  const interviewSuspicious = isScam && (noInterviewExplicit || (!interviewConducted && feeDetected));
+  const emailSuspicious = hasTelegram || recruiterGmail;
+  const interviewSuspicious = noInterviewExplicit || (feeDetected && !interviewConducted);
 
   if (isScam) {
     return {
@@ -173,10 +171,10 @@ export function analyzeOfferLocally(text: string): AnalysisResult {
         },
         senderEmail: {
           isFlagged: emailSuspicious,
-          status: hasTelegram ? '⚠️ Redirection to Telegram' : (hasGmail && !hasOfficialDomain) ? '⚠️ Generic @gmail.com' : '✅ No Suspicious Channel',
+          status: hasTelegram ? '⚠️ Redirection to Telegram' : recruiterGmail ? '⚠️ Recruiter Generic Webmail' : '✅ No Suspicious Channel',
           details: hasTelegram
             ? 'Scammers frequently direct college students to anonymous Telegram channels to bypass enterprise security audit trails.'
-            : emailSuspicious ? 'Official recruiters use enterprise emails like @tcs.com, not free public webmail or private handles.'
+            : emailSuspicious ? 'Official recruiters use enterprise emails like @tcs.com, not free public webmail handles.'
             : 'No suspicious communication channel detected.',
           ruleText: 'Rule: Cross-check the domain after the @ sign.'
         },
@@ -184,14 +182,14 @@ export function analyzeOfferLocally(text: string): AnalysisResult {
           isFlagged: interviewSuspicious,
           status: noInterviewExplicit ? '⚠️ Selected without Interview' : interviewSuspicious ? '⚠️ No Rigorous Assessment Found' : '✅ Assessment Referenced',
           details: interviewSuspicious
-            ? 'Real technical internships require at least one phone, coding, or video conversation with a team member.'
+            ? 'Real technical internships require at least one phone, coding, or video evaluation with a team member.'
             : 'Assessment or evaluation process referenced in the offer.',
           ruleText: "Rule: If you didn't interview, it's almost always a scam."
         }
       },
       reasons: [
-        feeDetected ? 'Requests upfront financial deposit or laptop collateral (Violates corporate recruitment standards).' : null,
-        emailSuspicious ? 'Uses public/unverified communication channel (Telegram/Gmail) instead of official corporate domain.' : null,
+        feeDetected ? 'Requests upfront financial deposit or registration fee (Violates recruitment ethics).' : null,
+        emailSuspicious ? 'Uses public/unverified channel (Telegram/free webmail) instead of official corporate domain.' : null,
         interviewSuspicious ? 'Offers employment without technical evaluation or standard interview validation.' : null,
         hasUrgency ? 'Applies extreme psychological time pressure to rush payments.' : null,
         hasTelegram ? 'Redirects communication to anonymous Telegram channel.' : null
@@ -217,8 +215,7 @@ export function analyzeOfferLocally(text: string): AnalysisResult {
   } else {
     // Determine nuanced safe statuses
     const emailStatus = hasOfficialDomain ? '✅ Official Corporate Domain'
-      : hasGmail ? '⚠️ Public Email (Not a scam indicator alone)'
-      : '✅ No Suspicious Channel';
+      : '✅ Verified / Normal Communication';
 
     const interviewStatus = interviewConducted ? '✅ Formal Interview Conducted'
       : '✅ Standard Hiring Process';
