@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C084FC" />
+      <stop offset="100%" stop-color="#7C3AED" />
+    </linearGradient>
+    <linearGradient id="innerShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7" />
+      <stop offset="100%" stop-color="#6D28D9" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#7C3AED" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Outer Shield -->
+  <path d="M250 60 L380 120 V250 C380 340 250 430 250 430 C250 430 120 340 120 250 V120 Z" 
+        fill="none" 
+        stroke="url(#shieldGrad)" 
+        stroke-width="26" 
+        stroke-linejoin="round" 
+        stroke-linecap="round"
+        filter="url(#shadow)" />
+
+  <!-- Inner Shield Solid -->
+  <path d="M250 140 L330 180 V260 C330 320 250 370 250 370 C250 370 170 320 170 260 V180 Z" 
+        fill="url(#innerShieldGrad)" />
+
+  <!-- Checkmark -->
+  <path d="M210 255 L240 285 L300 220" 
+        fill="none" 
+        stroke="#FFFFFF" 
+        stroke-width="22" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Tech Circuit Node Lines -->
+  <!-- Line 1 Top -->
+  <path d="M300 310 L340 310 L360 290 L400 290" 
+        fill="none" 
+        stroke="#A855F7" 
+        stroke-width="14" 
+        stroke-linecap="round" />
+  <circle cx="400" cy="290" r="14" fill="#A855F7" />
+  <circle cx="400" cy="290" r="6" fill="#FFFFFF" />
+
+  <!-- Line 2 Middle -->
+  <path d="M280 345 L350 345 L390 345" 
+        fill="none" 
+        stroke="#A855F7" 
+        stroke-width="14" 
+        stroke-linecap="round" />
+  <circle cx="390" cy="345" r="14" fill="#A855F7" />
+  <circle cx="390" cy="345" r="6" fill="#FFFFFF" />
+
+  <!-- Line 3 Bottom -->
+  <path d="M260 380 L320 380 L345 400 L370 400" 
+        fill="none" 
+        stroke="#A855F7" 
+        stroke-width="14" 
+        stroke-linecap="round" />
+  <circle cx="370" cy="400" r="14" fill="#A855F7" />
+  <circle cx="370" cy="400" r="6" fill="#FFFFFF" />
+</svg>

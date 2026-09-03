@@ -18,6 +18,7 @@ import {
   Upload,
   FileCheck
 } from 'lucide-react';
+import { Logo } from './Logo';
 import { analyzeOfferWithAI, AnalysisResult } from './analyzer';
 import { extractTextFromPDF } from './pdfExtractor';
 import { jsPDF } from 'jspdf';
@@ -153,15 +154,15 @@ export default function App() {
       
       {/* Top Navbar */}
       <header className={`border-b ${isDark ? 'border-slate-800/80 bg-[#070B13]/90' : 'border-slate-200 bg-white/90'} sticky top-0 z-50 backdrop-blur-md`}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
-              <Shield className="w-5 h-5" />
+            <div className="w-11 h-11 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center p-1.5 shadow-sm shadow-purple-500/20">
+              <Logo className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-bold text-lg tracking-tight">SafeOffer</h1>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
                   AI Cyber Defense
                 </span>
               </div>
@@ -193,7 +194,7 @@ export default function App() {
               }`}
               title="Toggle theme"
             >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-purple-500" />}
               <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
             </button>
           </div>
@@ -204,9 +205,9 @@ export default function App() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
         
         {/* Hero Title */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium">
-            <Sparkles className="w-3.5 h-3.5" />
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium shadow-sm">
+            <Logo className="w-4 h-4" />
             <span>Instant AI NLP Legitimacy Check</span>
           </div>
           <h2 className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -234,18 +235,14 @@ export default function App() {
                 ? 'border-emerald-500/50 bg-emerald-950/20'
                 : 'border-emerald-300 bg-emerald-50/60'
               : isDark 
-                ? 'border-indigo-500/30 bg-indigo-950/10 hover:bg-indigo-950/30 hover:border-indigo-500/60' 
-                : 'border-indigo-200 bg-indigo-50/40 hover:bg-indigo-50/80 hover:border-indigo-300'
+                ? 'border-purple-500/30 bg-purple-950/10 hover:bg-purple-950/20 hover:border-purple-500/60' 
+                : 'border-purple-200 bg-purple-50/30 hover:bg-purple-50/70 hover:border-purple-300'
           }`}
         >
-          <div className={`w-12 h-12 mx-auto rounded-xl flex items-center justify-center group-hover:scale-110 transition mb-3 ${
-            uploadedFile 
-              ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400'
-              : 'bg-indigo-600/20 border border-indigo-500/30 text-indigo-400'
-          }`}>
-            {uploadedFile ? <FileCheck className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
+          <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center group-hover:scale-105 transition mb-3 p-2 bg-purple-500/15 border border-purple-500/30">
+            {uploadedFile ? <FileCheck className="w-7 h-7 text-emerald-400" /> : <Logo className="w-9 h-9" />}
           </div>
-          <div className={`text-sm font-bold uppercase tracking-wider ${uploadedFile ? 'text-emerald-400' : 'text-indigo-400'}`}>
+          <div className={`text-sm font-bold uppercase tracking-wider ${uploadedFile ? 'text-emerald-400' : 'text-purple-400'}`}>
             {isParsingPdf 
               ? 'Reading document...' 
               : uploadedFile 
@@ -263,7 +260,7 @@ export default function App() {
         <div className={`p-5 rounded-2xl border ${isDark ? 'bg-[#0B111E] border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-indigo-400" />
+              <Mail className="w-4 h-4 text-purple-400" />
               <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                 {uploadedFile ? `Scanning from file: ${uploadedFile.name}` : 'Or Paste Offer Communication Text'}
               </label>
@@ -305,7 +302,7 @@ export default function App() {
                 ? `Document "${uploadedFile.name}" is attached. Click "Check Offer Safety" below to analyze it.` 
                 : "Paste offer email body, WhatsApp message, Telegram text, or stipend terms here..."
             }
-            className={`w-full p-4 rounded-xl text-xs sm:text-sm font-mono border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y ${
+            className={`w-full p-4 rounded-xl text-xs sm:text-sm font-mono border focus:outline-none focus:ring-2 focus:ring-purple-500 transition resize-y ${
               uploadedFile 
                 ? isDark ? 'bg-slate-900/40 text-slate-500 border-slate-800' : 'bg-slate-100 text-slate-400 border-slate-200'
                 : isDark 
@@ -316,16 +313,16 @@ export default function App() {
 
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <div className="flex items-center gap-2 text-xs text-slate-400">
-              <Lock className="w-3.5 h-3.5 text-indigo-400" />
+              <Lock className="w-3.5 h-3.5 text-purple-400" />
               <span>Privacy assured: Analyzed securely in your browser.</span>
             </div>
 
             <button
               onClick={handleAnalyze}
               disabled={isAnalyzing || (!inputText.trim() && !uploadedFile)}
-              className="w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
-              <Shield className="w-4 h-4" />
+              <Logo className="w-4 h-4 brightness-200" />
               <span>{isAnalyzing ? 'Evaluating Offer...' : 'Check Offer Safety'}</span>
             </button>
           </div>
@@ -499,7 +496,7 @@ export default function App() {
                   </p>
                 </div>
 
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
                   {completedCount} of 3 Completed
                 </span>
               </div>
@@ -514,8 +511,8 @@ export default function App() {
                       className={`p-3.5 rounded-xl border cursor-pointer transition flex items-center gap-3 text-xs sm:text-sm ${
                         isChecked
                           ? isDark 
-                            ? 'bg-indigo-950/30 border-indigo-500/60 text-indigo-200' 
-                            : 'bg-indigo-50 border-indigo-300 text-indigo-900'
+                            ? 'bg-purple-950/30 border-purple-500/60 text-purple-200' 
+                            : 'bg-purple-50 border-purple-300 text-purple-900'
                           : isDark
                             ? 'bg-[#060911] border-slate-800/90 text-slate-300 hover:border-slate-700'
                             : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
@@ -523,7 +520,7 @@ export default function App() {
                     >
                       <div className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition ${
                         isChecked 
-                          ? 'bg-indigo-600 border-indigo-600 text-white' 
+                          ? 'bg-purple-600 border-purple-600 text-white' 
                           : isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-300 bg-white'
                       }`}>
                         {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -576,8 +573,9 @@ export default function App() {
         isDark ? 'border-slate-800/80 text-slate-500 bg-[#070B13]' : 'border-slate-200 text-slate-500 bg-white'
       }`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div>
-            © 2026 SafeOffer AI • Simple Internship & Job Protection for Students
+          <div className="flex items-center gap-2">
+            <Logo className="w-4 h-4" />
+            <span>© 2026 SafeOffer AI • Simple Internship & Job Protection for Students</span>
           </div>
           <div className="flex items-center gap-4 text-[11px]">
             <span>Zero cybersecurity jargon</span>
