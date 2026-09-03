@@ -15,7 +15,8 @@ import {
   DollarSign, 
   VideoOff, 
   PhoneCall,
-  Upload
+  Upload,
+  FileCheck
 } from 'lucide-react';
 import { analyzeOfferWithAI, AnalysisResult } from './analyzer';
 import { extractTextFromPDF } from './pdfExtractor';
@@ -26,7 +27,7 @@ export default function App() {
   const [inputText, setInputText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isParsingPdf, setIsParsingPdf] = useState(false);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [checklistState, setChecklistState] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,13 +42,16 @@ export default function App() {
   }, [isDark]);
 
   // Only analyze when explicitly called by user clicking "Check Offer Safety"
-  const handleAnalyze = async (textToAnalyze?: string) => {
-    const query = typeof textToAnalyze === 'string' ? textToAnalyze : inputText;
-    if (!query.trim()) return;
+  const handleAnalyze = async () => {
+    const textToScan = uploadedFile?.content || inputText;
+    if (!textToScan.trim()) {
+      alert("Please upload a file or paste offer text first.");
+      return;
+    }
 
     setIsAnalyzing(true);
     try {
-      const res = await analyzeOfferWithAI(query);
+      const res = await analyzeOfferWithAI(textToScan);
       setResult(res);
       setChecklistState({ 1: false, 2: false, 3: false });
     } catch (err) {
@@ -61,16 +65,15 @@ export default function App() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploadedFileName(file.name);
-    setResult(null); // Clear previous result until user clicks analyze
+    setResult(null); // Clear previous result
 
     if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
       setIsParsingPdf(true);
       try {
         const text = await extractTextFromPDF(file);
-        setInputText(text);
+        setUploadedFile({ name: file.name, content: text });
       } catch (err) {
-        alert('Could not parse PDF text directly. Please paste the offer text into the box.');
+        alert('Could not read PDF text directly. Please paste the offer text below.');
       } finally {
         setIsParsingPdf(false);
       }
@@ -79,7 +82,7 @@ export default function App() {
       reader.onload = (event) => {
         const text = event.target?.result as string;
         if (text) {
-          setInputText(text);
+          setUploadedFile({ name: file.name, content: text });
         }
       };
       reader.readAsText(file);
@@ -97,7 +100,7 @@ export default function App() {
       const text = await navigator.clipboard.readText();
       if (text) {
         setInputText(text);
-        setUploadedFileName(null);
+        setUploadedFile(null);
         setResult(null);
       }
     } catch {
@@ -107,7 +110,7 @@ export default function App() {
 
   const handleClear = () => {
     setInputText('');
-    setUploadedFileName(null);
+    setUploadedFile(null);
     setResult(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -210,7 +213,7 @@ export default function App() {
             Is your internship or job offer real or a scam?
           </h2>
           <p className={`text-sm sm:text-base max-w-xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Upload your offer letter PDF or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards.
+            Upload your offer letter file or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards.
           </p>
         </div>
 
@@ -226,19 +229,33 @@ export default function App() {
         <div
           onClick={() => fileInputRef.current?.click()}
           className={`p-6 rounded-2xl border-2 border-dashed cursor-pointer text-center transition group ${
-            isDark 
-              ? 'border-indigo-500/30 bg-indigo-950/10 hover:bg-indigo-950/30 hover:border-indigo-500/60' 
-              : 'border-indigo-200 bg-indigo-50/40 hover:bg-indigo-50/80 hover:border-indigo-300'
+            uploadedFile
+              ? isDark
+                ? 'border-emerald-500/50 bg-emerald-950/20'
+                : 'border-emerald-300 bg-emerald-50/60'
+              : isDark 
+                ? 'border-indigo-500/30 bg-indigo-950/10 hover:bg-indigo-950/30 hover:border-indigo-500/60' 
+                : 'border-indigo-200 bg-indigo-50/40 hover:bg-indigo-50/80 hover:border-indigo-300'
           }`}
         >
-          <div className="w-12 h-12 mx-auto rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition mb-3">
-            <Upload className="w-6 h-6" />
+          <div className={`w-12 h-12 mx-auto rounded-xl flex items-center justify-center group-hover:scale-110 transition mb-3 ${
+            uploadedFile 
+              ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400'
+              : 'bg-indigo-600/20 border border-indigo-500/30 text-indigo-400'
+          }`}>
+            {uploadedFile ? <FileCheck className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
           </div>
-          <div className="text-sm font-bold text-indigo-400 uppercase tracking-wider">
-            {isParsingPdf ? 'Reading PDF Text...' : 'Click to Upload Offer Letter (PDF / DOC / TXT)'}
+          <div className={`text-sm font-bold uppercase tracking-wider ${uploadedFile ? 'text-emerald-400' : 'text-indigo-400'}`}>
+            {isParsingPdf 
+              ? 'Reading document...' 
+              : uploadedFile 
+                ? `Uploaded: ${uploadedFile.name}` 
+                : 'Click to Upload Offer Letter (PDF / DOC / TXT)'}
           </div>
           <div className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            {uploadedFileName ? `Selected: ${uploadedFileName}` : 'or paste the offer text directly below'}
+            {uploadedFile 
+              ? 'Document ready for scanning • Click "Check Offer Safety" below' 
+              : 'or paste text directly into the box below'}
           </div>
         </div>
 
@@ -248,14 +265,11 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-indigo-400" />
               <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                {uploadedFileName ? `Extracted Content: ${uploadedFileName}` : 'Internship / Job Offer Text'}
+                {uploadedFile ? `Scanning from file: ${uploadedFile.name}` : 'Or Paste Offer Communication Text'}
               </label>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                {inputText.length} characters
-              </span>
               <button
                 onClick={handlePaste}
                 className={`text-xs font-medium px-2.5 py-1 rounded-md border flex items-center gap-1.5 transition ${
@@ -265,7 +279,7 @@ export default function App() {
                 <Copy className="w-3.5 h-3.5" />
                 Paste Clipboard
               </button>
-              {inputText && (
+              {(inputText || uploadedFile) && (
                 <button
                   onClick={handleClear}
                   className={`text-xs font-medium px-2 py-1 rounded-md transition ${
@@ -282,14 +296,21 @@ export default function App() {
             value={inputText}
             onChange={(e) => {
               setInputText(e.target.value);
-              setUploadedFileName(null);
+              setUploadedFile(null);
             }}
-            rows={7}
-            placeholder="Paste any offer email, job letter body, WhatsApp message, Telegram text, or stipend terms here..."
+            disabled={!!uploadedFile}
+            rows={6}
+            placeholder={
+              uploadedFile 
+                ? `Document "${uploadedFile.name}" is attached. Click "Check Offer Safety" below to analyze it.` 
+                : "Paste offer email body, WhatsApp message, Telegram text, or stipend terms here..."
+            }
             className={`w-full p-4 rounded-xl text-xs sm:text-sm font-mono border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y ${
-              isDark 
-                ? 'bg-[#060911] border-slate-800 text-slate-200 placeholder-slate-600' 
-                : 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400'
+              uploadedFile 
+                ? isDark ? 'bg-slate-900/40 text-slate-500 border-slate-800' : 'bg-slate-100 text-slate-400 border-slate-200'
+                : isDark 
+                  ? 'bg-[#060911] border-slate-800 text-slate-200 placeholder-slate-600' 
+                  : 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400'
             }`}
           />
 
@@ -300,8 +321,8 @@ export default function App() {
             </div>
 
             <button
-              onClick={() => handleAnalyze()}
-              disabled={isAnalyzing || !inputText.trim()}
+              onClick={handleAnalyze}
+              disabled={isAnalyzing || (!inputText.trim() && !uploadedFile)}
               className="w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Shield className="w-4 h-4" />
@@ -310,7 +331,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* DECISION -> REASON -> NEXT ACTION RESULTS SECTION (ONLY AFTER USER CLICKS BUTTON) */}
+        {/* DECISION -> REASON -> NEXT ACTION RESULTS SECTION */}
         {result && (
           <div className="space-y-6 animate-in fade-in duration-300">
             
