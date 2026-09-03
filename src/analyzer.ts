@@ -144,15 +144,18 @@ export function analyzeOfferLocally(text: string): AnalysisResult {
   const noInterviewExplicit = /without\s+(?:any\s+)?(?:technical\s+)?interview|no\s+(?:technical\s+)?interview|direct(?:ly)?\s+select(?:ed)?\s+based\s+on\s+resume/i.test(text);
   const interviewConducted = /technical\s+interview|aptitude\s+test|assessment|coding\s+(?:round|test|challenge)|interview\s+(?:round|panel|process)|hackathon|evaluated|shortlisted\s+(?:based|after|through)|campus\s+(?:drive|placement|recruitment)|appeared\s+for|clearing\s+the/i.test(text);
 
-  // 4. Urgency pressure
+  // 4. Marketing spam & clickbait detection
+  const isMarketingSpam = /who\s+exactly\s+is\s+jia|unstop\.news|read\s+my\s+latest\s+linkedin\s+post|memes\s+and\s+posts\s+around\s+jia/i.test(text);
+
+  // 5. Urgency pressure
   const hasUrgency = /urgent|within\s+\d+\s+hours?|today\s+only|immediate(?:ly)?|last\s+date.*today|respond\s+(?:now|immediately|asap)/i.test(text);
 
   // === STRICT FRAUD DETERMINATION ===
-  // In corporate recruitment fraud, asking an intern/applicant for money or using Telegram is an instant scam.
-  const isScam = feeDetected || hasTelegram || recruiterGmail || noInterviewExplicit || (hasUrgency && feeDetected);
+  // In corporate recruitment fraud, asking an intern/applicant for money, telegram, or marketing clickbait is an instant scam.
+  const isScam = feeDetected || hasTelegram || recruiterGmail || noInterviewExplicit || isMarketingSpam || (hasUrgency && feeDetected);
 
-  const emailSuspicious = hasTelegram || recruiterGmail;
-  const interviewSuspicious = noInterviewExplicit || (feeDetected && !interviewConducted);
+  const emailSuspicious = hasTelegram || recruiterGmail || isMarketingSpam;
+  const interviewSuspicious = noInterviewExplicit || isMarketingSpam || (feeDetected && !interviewConducted);
 
   if (isScam) {
     return {
@@ -171,16 +174,18 @@ export function analyzeOfferLocally(text: string): AnalysisResult {
         },
         senderEmail: {
           isFlagged: emailSuspicious,
-          status: hasTelegram ? '⚠️ Redirection to Telegram' : recruiterGmail ? '⚠️ Recruiter Generic Webmail' : '✅ No Suspicious Channel',
+          status: hasTelegram ? '⚠️ Redirection to Telegram' : isMarketingSpam ? '⚠️ Promotional / Clickbait Newsletter' : recruiterGmail ? '⚠️ Recruiter Generic Webmail' : '✅ No Suspicious Channel',
           details: hasTelegram
             ? 'Scammers frequently direct college students to anonymous Telegram channels to bypass enterprise security audit trails.'
+            : isMarketingSpam
+            ? 'Promotional clickbait / newsletter without formal corporate offer authorization or employment terms.'
             : emailSuspicious ? 'Official recruiters use enterprise emails like @tcs.com, not free public webmail handles.'
             : 'No suspicious communication channel detected.',
-          ruleText: 'Rule: Cross-check the domain after the @ sign.'
+          ruleText: 'Rule: Official offers contain direct corporate contracts, not newsletters.'
         },
         interviewProcess: {
           isFlagged: interviewSuspicious,
-          status: noInterviewExplicit ? '⚠️ Selected without Interview' : interviewSuspicious ? '⚠️ No Rigorous Assessment Found' : '✅ Assessment Referenced',
+          status: noInterviewExplicit ? '⚠️ Selected without Interview' : isMarketingSpam ? '⚠️ No Interview / Not an Offer' : interviewSuspicious ? '⚠️ No Rigorous Assessment Found' : '✅ Assessment Referenced',
           details: interviewSuspicious
             ? 'Real technical internships require at least one phone, coding, or video evaluation with a team member.'
             : 'Assessment or evaluation process referenced in the offer.',
@@ -189,8 +194,9 @@ export function analyzeOfferLocally(text: string): AnalysisResult {
       },
       reasons: [
         feeDetected ? 'Requests upfront financial deposit or registration fee (Violates recruitment ethics).' : null,
-        emailSuspicious ? 'Uses public/unverified channel (Telegram/free webmail) instead of official corporate domain.' : null,
-        interviewSuspicious ? 'Offers employment without technical evaluation or standard interview validation.' : null,
+        isMarketingSpam ? 'Promotional newsletter / clickbait email masquerading as student recruitment communication.' : null,
+        emailSuspicious && !isMarketingSpam ? 'Uses public/unverified channel (Telegram/free webmail) instead of official corporate domain.' : null,
+        interviewSuspicious && !isMarketingSpam ? 'Offers employment without technical evaluation or standard interview validation.' : null,
         hasUrgency ? 'Applies extreme psychological time pressure to rush payments.' : null,
         hasTelegram ? 'Redirects communication to anonymous Telegram channel.' : null
       ].filter(Boolean) as string[],
