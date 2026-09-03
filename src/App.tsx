@@ -16,18 +16,20 @@ import {
   VideoOff, 
   PhoneCall,
   Upload,
-  FileCheck
+  FileCheck,
+  Loader2
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { analyzeOfferWithAI, AnalysisResult } from './analyzer';
-import { extractTextFromPDF } from './pdfExtractor';
+import { extractTextFromPDF, extractTextFromImage } from './pdfExtractor';
 import { jsPDF } from 'jspdf';
 
 export default function App() {
   const [isDark, setIsDark] = useState(true);
   const [inputText, setInputText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isParsingPdf, setIsParsingPdf] = useState(false);
+  const [isReadingFile, setIsReadingFile] = useState(false);
+  const [fileProgress, setFileProgress] = useState<string>('');
   const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [checklistState, setChecklistState] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
@@ -42,11 +44,10 @@ export default function App() {
     }
   }, [isDark]);
 
-  // Only analyze when explicitly called by user clicking "Check Offer Safety"
   const handleAnalyze = async () => {
-    const textToScan = uploadedFile?.content || inputText;
-    if (!textToScan.trim()) {
-      alert("Please upload a file or paste offer text first.");
+    const textToScan = (uploadedFile?.content || inputText).trim();
+    if (!textToScan) {
+      alert("Please upload an offer document or paste text first.");
       return;
     }
 
@@ -66,27 +67,36 @@ export default function App() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setResult(null); // Clear previous result
+    setResult(null);
+    setIsReadingFile(true);
+    setFileProgress(`Reading ${file.name}...`);
 
-    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-      setIsParsingPdf(true);
-      try {
-        const text = await extractTextFromPDF(file);
-        setUploadedFile({ name: file.name, content: text });
-      } catch (err) {
-        alert('Could not read PDF text directly. Please paste the offer text below.');
-      } finally {
-        setIsParsingPdf(false);
+    try {
+      let extracted = '';
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        setFileProgress('Scanning PDF (OCR + Text extraction)...');
+        extracted = await extractTextFromPDF(file);
+      } else if (file.type.startsWith('image/')) {
+        setFileProgress('Running OCR on image...');
+        extracted = await extractTextFromImage(file);
+      } else {
+        extracted = await file.text();
       }
-    } else {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target?.result as string;
-        if (text) {
-          setUploadedFile({ name: file.name, content: text });
-        }
-      };
-      reader.readAsText(file);
+
+      if (extracted.trim()) {
+        setUploadedFile({ name: file.name, content: extracted });
+        setFileProgress('');
+      } else {
+        alert('Could not extract readable text from this file. Please paste the offer text into the box.');
+        setUploadedFile(null);
+      }
+    } catch (err) {
+      console.error('File parsing error:', err);
+      alert('Error reading file. Please paste the text directly.');
+      setUploadedFile(null);
+    } finally {
+      setIsReadingFile(false);
+      setFileProgress('');
     }
   };
 
@@ -214,7 +224,7 @@ export default function App() {
             Is your internship or job offer real or a scam?
           </h2>
           <p className={`text-sm sm:text-base max-w-xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Upload your offer letter file or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards.
+            Upload your offer letter PDF / image or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards.
           </p>
         </div>
 
@@ -223,12 +233,12 @@ export default function App() {
           type="file"
           ref={fileInputRef}
           onChange={handleFileUpload}
-          accept=".pdf,.txt,.doc,.docx"
+          accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx"
           className="hidden"
         />
 
         <div
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => !isReadingFile && fileInputRef.current?.click()}
           className={`p-6 rounded-2xl border-2 border-dashed cursor-pointer text-center transition group ${
             uploadedFile
               ? isDark
@@ -240,19 +250,25 @@ export default function App() {
           }`}
         >
           <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center group-hover:scale-105 transition mb-3 p-2 bg-purple-500/15 border border-purple-500/30">
-            {uploadedFile ? <FileCheck className="w-7 h-7 text-emerald-400" /> : <Logo className="w-9 h-9" />}
+            {isReadingFile ? (
+              <Loader2 className="w-7 h-7 text-purple-400 animate-spin" />
+            ) : uploadedFile ? (
+              <FileCheck className="w-7 h-7 text-emerald-400" />
+            ) : (
+              <Logo className="w-9 h-9" />
+            )}
           </div>
           <div className={`text-sm font-bold uppercase tracking-wider ${uploadedFile ? 'text-emerald-400' : 'text-purple-400'}`}>
-            {isParsingPdf 
-              ? 'Reading document...' 
+            {isReadingFile 
+              ? (fileProgress || 'Processing document & OCR...') 
               : uploadedFile 
                 ? `Uploaded: ${uploadedFile.name}` 
-                : 'Click to Upload Offer Letter (PDF / DOC / TXT)'}
+                : 'Click to Upload Offer Letter (PDF / PNG / JPG / DOC)'}
           </div>
           <div className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {uploadedFile 
               ? 'Document ready for scanning • Click "Check Offer Safety" below' 
-              : 'or paste text directly into the box below'}
+              : 'Supports digital PDFs, scanned images, and camera photos'}
           </div>
         </div>
 
@@ -262,7 +278,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-purple-400" />
               <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                {uploadedFile ? `Scanning from file: ${uploadedFile.name}` : 'Or Paste Offer Communication Text'}
+                {uploadedFile ? `Document Attached: ${uploadedFile.name}` : 'Or Paste Offer Communication Text'}
               </label>
             </div>
 
@@ -319,7 +335,7 @@ export default function App() {
 
             <button
               onClick={handleAnalyze}
-              disabled={isAnalyzing || (!inputText.trim() && !uploadedFile)}
+              disabled={isAnalyzing || isReadingFile || (!inputText.trim() && !uploadedFile)}
               className="w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Logo className="w-4 h-4 brightness-200" />
