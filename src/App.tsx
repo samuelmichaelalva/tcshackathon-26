@@ -40,6 +40,7 @@ export default function App() {
     }
   }, [isDark]);
 
+  // Only analyze when explicitly called by user clicking "Check Offer Safety"
   const handleAnalyze = async (textToAnalyze?: string) => {
     const query = typeof textToAnalyze === 'string' ? textToAnalyze : inputText;
     if (!query.trim()) return;
@@ -61,13 +62,13 @@ export default function App() {
     if (!file) return;
 
     setUploadedFileName(file.name);
+    setResult(null); // Clear previous result until user clicks analyze
 
     if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
       setIsParsingPdf(true);
       try {
         const text = await extractTextFromPDF(file);
         setInputText(text);
-        await handleAnalyze(text);
       } catch (err) {
         alert('Could not parse PDF text directly. Please paste the offer text into the box.');
       } finally {
@@ -75,11 +76,10 @@ export default function App() {
       }
     } else {
       const reader = new FileReader();
-      reader.onload = async (event) => {
+      reader.onload = (event) => {
         const text = event.target?.result as string;
         if (text) {
           setInputText(text);
-          await handleAnalyze(text);
         }
       };
       reader.readAsText(file);
@@ -98,6 +98,7 @@ export default function App() {
       if (text) {
         setInputText(text);
         setUploadedFileName(null);
+        setResult(null);
       }
     } catch {
       // Fallback
@@ -108,6 +109,9 @@ export default function App() {
     setInputText('');
     setUploadedFileName(null);
     setResult(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleExportPDF = () => {
@@ -206,7 +210,7 @@ export default function App() {
             Is your internship or job offer real or a scam?
           </h2>
           <p className={`text-sm sm:text-base max-w-xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Upload your offer letter PDF or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards in seconds.
+            Upload your offer letter PDF or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards.
           </p>
         </div>
 
@@ -231,10 +235,10 @@ export default function App() {
             <Upload className="w-6 h-6" />
           </div>
           <div className="text-sm font-bold text-indigo-400 uppercase tracking-wider">
-            {isParsingPdf ? 'Extracting text from PDF...' : 'Click to Upload Offer Letter (PDF / DOC / TXT)'}
+            {isParsingPdf ? 'Reading PDF Text...' : 'Click to Upload Offer Letter (PDF / DOC / TXT)'}
           </div>
           <div className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            {uploadedFileName ? `Selected: ${uploadedFileName}` : 'or paste the offer communication directly below'}
+            {uploadedFileName ? `Selected: ${uploadedFileName}` : 'or paste the offer text directly below'}
           </div>
         </div>
 
@@ -244,7 +248,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-indigo-400" />
               <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                {uploadedFileName ? `Document Content: ${uploadedFileName}` : 'Paste Internship / Job Offer Text'}
+                {uploadedFileName ? `Extracted Content: ${uploadedFileName}` : 'Internship / Job Offer Text'}
               </label>
             </div>
 
@@ -301,12 +305,12 @@ export default function App() {
               className="w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Shield className="w-4 h-4" />
-              <span>{isAnalyzing ? 'AI Evaluating Offer...' : 'Check Offer Safety'}</span>
+              <span>{isAnalyzing ? 'Evaluating Offer...' : 'Check Offer Safety'}</span>
             </button>
           </div>
         </div>
 
-        {/* DECISION -> REASON -> NEXT ACTION RESULTS SECTION */}
+        {/* DECISION -> REASON -> NEXT ACTION RESULTS SECTION (ONLY AFTER USER CLICKS BUTTON) */}
         {result && (
           <div className="space-y-6 animate-in fade-in duration-300">
             
