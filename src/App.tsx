@@ -26,14 +26,13 @@ import { extractTextFromPDF, extractTextFromImage } from './pdfExtractor';
 import { jsPDF } from 'jspdf';
 
 export default function App() {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [inputText, setInputText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isReadingFile, setIsReadingFile] = useState(false);
   const [fileProgress, setFileProgress] = useState<string>('');
   const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [checklistState, setChecklistState] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync dark class on root
@@ -56,7 +55,6 @@ export default function App() {
     try {
       const res = await analyzeOfferWithAI(textToScan);
       setResult(res);
-      setChecklistState({ 1: false, 2: false, 3: false });
     } catch (err) {
       console.error(err);
     } finally {
@@ -99,12 +97,6 @@ export default function App() {
       setFileProgress('');
     }
   };
-
-  const toggleChecklist = (id: number) => {
-    setChecklistState(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const completedCount = Object.values(checklistState).filter(Boolean).length;
 
   const handlePaste = async () => {
     try {
@@ -498,58 +490,11 @@ export default function App() {
 
             </div>
 
-            {/* 3. NEXT ACTION: Student Action Checklist */}
+            {/* Action Buttons */}
             <div className={`p-6 rounded-2xl border ${
               isDark ? 'bg-[#0B111E] border-slate-800' : 'bg-white border-slate-200 shadow-sm'
             }`}>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    What should you do right now?
-                  </h4>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Protect yourself with these 3 quick precautions:
-                  </p>
-                </div>
-
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                  {completedCount} of 3 Completed
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                {result.checklist.map((item) => {
-                  const isChecked = checklistState[item.id] || false;
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => toggleChecklist(item.id)}
-                      className={`p-3.5 rounded-xl border cursor-pointer transition flex items-center gap-3 text-xs sm:text-sm ${
-                        isChecked
-                          ? isDark 
-                            ? 'bg-purple-950/30 border-purple-500/60 text-purple-200' 
-                            : 'bg-purple-50 border-purple-300 text-purple-900'
-                          : isDark
-                            ? 'bg-[#060911] border-slate-800/90 text-slate-300 hover:border-slate-700'
-                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition ${
-                        isChecked 
-                          ? 'bg-purple-600 border-purple-600 text-white' 
-                          : isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-300 bg-white'
-                      }`}>
-                        {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                      </div>
-                      <span className={isChecked ? 'line-through opacity-80' : ''}>
-                        {item.text}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-5 pt-4 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     onClick={handleExportPDF}
