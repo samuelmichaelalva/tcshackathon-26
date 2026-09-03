@@ -17,7 +17,8 @@ import {
   PhoneCall,
   Upload,
   FileCheck,
-  Loader2
+  Loader2,
+  CheckCircle2
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { analyzeOfferWithAI, AnalysisResult } from './analyzer';
@@ -69,30 +70,29 @@ export default function App() {
 
     setResult(null);
     setIsReadingFile(true);
-    setFileProgress(`Reading ${file.name}...`);
+    setFileProgress(`Loading ${file.name}...`);
 
     try {
       let extracted = '';
-      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        setFileProgress('Scanning PDF (OCR + Text extraction)...');
-        extracted = await extractTextFromPDF(file);
+      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+        setFileProgress('Extracting PDF & OCR scanning...');
+        extracted = await extractTextFromPDF(file, (msg) => setFileProgress(msg));
       } else if (file.type.startsWith('image/')) {
         setFileProgress('Running OCR on image...');
-        extracted = await extractTextFromImage(file);
+        extracted = await extractTextFromImage(file, (msg) => setFileProgress(msg));
       } else {
         extracted = await file.text();
       }
 
-      if (extracted.trim()) {
-        setUploadedFile({ name: file.name, content: extracted });
-        setFileProgress('');
+      if (extracted && extracted.trim().length > 0) {
+        setUploadedFile({ name: file.name, content: extracted.trim() });
       } else {
-        alert('Could not extract readable text from this file. Please paste the offer text into the box.');
+        alert('Could not detect readable text from this scan. Please copy and paste the offer text into the box below.');
         setUploadedFile(null);
       }
     } catch (err) {
       console.error('File parsing error:', err);
-      alert('Error reading file. Please paste the text directly.');
+      alert('Could not complete OCR. Please copy-paste the offer text directly.');
       setUploadedFile(null);
     } finally {
       setIsReadingFile(false);
@@ -224,7 +224,7 @@ export default function App() {
             Is your internship or job offer real or a scam?
           </h2>
           <p className={`text-sm sm:text-base max-w-xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Upload your offer letter PDF / image or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards.
+            Upload your offer letter PDF / image scan or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards.
           </p>
         </div>
 
@@ -267,8 +267,8 @@ export default function App() {
           </div>
           <div className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {uploadedFile 
-              ? 'Document ready for scanning • Click "Check Offer Safety" below' 
-              : 'Supports digital PDFs, scanned images, and camera photos'}
+              ? `Document ready (${uploadedFile.content.length} characters extracted) • Click "Check Offer Safety" below` 
+              : 'Supports digital PDFs, camera scans, and photo letters'}
           </div>
         </div>
 
@@ -278,7 +278,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-purple-400" />
               <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                {uploadedFile ? `Document Attached: ${uploadedFile.name}` : 'Or Paste Offer Communication Text'}
+                {uploadedFile ? `Attached: ${uploadedFile.name}` : 'Or Paste Offer Communication Text'}
               </label>
             </div>
 
@@ -315,7 +315,7 @@ export default function App() {
             rows={6}
             placeholder={
               uploadedFile 
-                ? `Document "${uploadedFile.name}" is attached. Click "Check Offer Safety" below to analyze it.` 
+                ? `Document "${uploadedFile.name}" is attached and ready. Click "Check Offer Safety" below to analyze it.` 
                 : "Paste offer email body, WhatsApp message, Telegram text, or stipend terms here..."
             }
             className={`w-full p-4 rounded-xl text-xs sm:text-sm font-mono border focus:outline-none focus:ring-2 focus:ring-purple-500 transition resize-y ${
