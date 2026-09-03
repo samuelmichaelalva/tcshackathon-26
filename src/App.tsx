@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Shield, 
   ShieldAlert, 
@@ -9,7 +9,6 @@ import {
   Check, 
   RotateCcw, 
   Download, 
-  ExternalLink, 
   Lock, 
   Sparkles, 
   AlertTriangle, 
@@ -17,19 +16,24 @@ import {
   DollarSign, 
   VideoOff, 
   PhoneCall,
-  CheckCircle2
+  FileText,
+  Upload,
+  Briefcase
 } from 'lucide-react';
 import { SAMPLE_OFFERS, analyzeOfferText, AnalysisResult } from './analyzer';
+import { extractTextFromPDF } from './pdfExtractor';
 import { jsPDF } from 'jspdf';
 
 export default function App() {
   const [isDark, setIsDark] = useState(true);
-  const [inputText, setInputText] = useState(SAMPLE_OFFERS[0].text);
-  const [selectedSampleId, setSelectedSampleId] = useState<string>(SAMPLE_OFFERS[0].id);
+  const [inputText, setInputText] = useState('');
+  const [selectedSampleId, setSelectedSampleId] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState<AnalysisResult>(() => analyzeOfferText(SAMPLE_OFFERS[0].text));
+  const [isParsingPdf, setIsParsingPdf] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [checklistState, setChecklistState] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
-  const [copied, setCopied] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync dark class on root
   useEffect(() => {
@@ -43,6 +47,7 @@ export default function App() {
   const handleSelectSample = (sample: typeof SAMPLE_OFFERS[0]) => {
     setSelectedSampleId(sample.id);
     setInputText(sample.text);
+    setUploadedFileName(null);
     handleAnalyze(sample.text);
   };
 
@@ -56,7 +61,38 @@ export default function App() {
       setResult(res);
       setChecklistState({ 1: false, 2: false, 3: false });
       setIsAnalyzing(false);
-    }, 300);
+    }, 250);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadedFileName(file.name);
+    setSelectedSampleId('');
+
+    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+      setIsParsingPdf(true);
+      try {
+        const text = await extractTextFromPDF(file);
+        setInputText(text);
+        handleAnalyze(text);
+      } catch (err) {
+        alert('Could not parse PDF text directly. Please paste the offer text into the box.');
+      } finally {
+        setIsParsingPdf(false);
+      }
+    } else {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        if (text) {
+          setInputText(text);
+          handleAnalyze(text);
+        }
+      };
+      reader.readAsText(file);
+    }
   };
 
   const toggleChecklist = (id: number) => {
@@ -71,21 +107,25 @@ export default function App() {
       if (text) {
         setInputText(text);
         setSelectedSampleId('');
+        setUploadedFileName(null);
       }
     } catch {
-      // Fallback if permission blocked
+      // Fallback
     }
   };
 
   const handleClear = () => {
     setInputText('');
     setSelectedSampleId('');
+    setUploadedFileName(null);
+    setResult(null);
   };
 
   const handleExportPDF = () => {
+    if (!result) return;
     const doc = new jsPDF();
     doc.setFontSize(18);
-    doc.text('SafeOffer AI - Internship Offer Verification Audit', 14, 20);
+    doc.text('SafeOffer AI - Internship & Job Offer Verification Audit', 14, 20);
     doc.setFontSize(12);
     doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
     doc.text('------------------------------------------------------------', 14, 34);
@@ -109,7 +149,7 @@ export default function App() {
     doc.text('------------------------------------------------------------', 14, 140);
     doc.setFontSize(10);
     doc.text('TCS Tech Day 2026 Prototype | AI + Cyber Defense Track', 14, 148);
-    doc.save('SafeOffer_Internship_Verification_Report.pdf');
+    doc.save('SafeOffer_Verification_Report.pdf');
   };
 
   return (
@@ -130,7 +170,7 @@ export default function App() {
                 </span>
               </div>
               <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Student Internship Scam Checker
+                Internship & Job Offer Scam Detector
               </p>
             </div>
           </div>
@@ -171,50 +211,75 @@ export default function App() {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Instant 3-Second Legitimacy Check</span>
+            <span>Instant AI Legitimacy & Fraud Check</span>
           </div>
           <h2 className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Is your internship offer real or a scam?
+            Is your internship or job offer real or a scam?
           </h2>
           <p className={`text-sm sm:text-base max-w-xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Paste any offer letter, WhatsApp chat, or email to verify fees, recruiter legitimacy, and interview standards in seconds.
+            Upload your offer letter PDF or paste any recruiter message, WhatsApp chat, or email to verify upfront fees, recruiter legitimacy, and interview standards.
           </p>
         </div>
 
-        {/* Try A Sample Offer Quick Buttons */}
-        <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#0B111E] border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-              Try a sample offer:
-            </span>
-          </div>
+        {/* Upload & Preset Options */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          {/* Direct File / PDF Upload Button */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".pdf,.txt,.doc,.docx"
+            className="hidden"
+          />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-            {SAMPLE_OFFERS.map((sample) => {
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-4 rounded-2xl border text-left flex items-center gap-3.5 transition group ${
+              isDark 
+                ? 'border-indigo-500/30 bg-indigo-950/20 hover:bg-indigo-950/40 hover:border-indigo-500/60' 
+                : 'border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 hover:border-indigo-300'
+            }`}
+          >
+            <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0 group-hover:scale-105 transition">
+              <Upload className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
+                {isParsingPdf ? 'Reading PDF...' : 'Upload Offer Letter'}
+              </div>
+              <div className={`text-xs mt-0.5 truncate ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                {uploadedFileName || 'Select PDF or Text File'}
+              </div>
+            </div>
+          </button>
+
+          {/* Preset Buttons for Demo */}
+          <div className="sm:col-span-2 grid grid-cols-2 gap-2">
+            {SAMPLE_OFFERS.slice(0, 4).map((sample) => {
               const isSelected = selectedSampleId === sample.id;
               const isFake = sample.badgeType === 'fake';
               return (
                 <button
                   key={sample.id}
                   onClick={() => handleSelectSample(sample)}
-                  className={`text-left p-3 rounded-xl border transition-all text-xs flex flex-col justify-between ${
+                  className={`text-left p-2.5 rounded-xl border transition text-xs flex flex-col justify-center ${
                     isSelected
                       ? isDark 
-                        ? 'border-indigo-500 bg-indigo-950/40 ring-1 ring-indigo-500' 
-                        : 'border-indigo-500 bg-indigo-50/70 ring-1 ring-indigo-500'
+                        ? 'border-indigo-500 bg-indigo-950/50 ring-1 ring-indigo-500' 
+                        : 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500'
                       : isDark
-                        ? 'border-slate-800 bg-[#0F172A]/70 hover:border-slate-700 hover:bg-[#0F172A]'
-                        : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/80'
+                        ? 'border-slate-800 bg-[#0B111E] hover:border-slate-700'
+                        : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
                   }`}
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`w-2 h-2 rounded-full ${isFake ? 'bg-rose-500 ring-2 ring-rose-500/20' : 'bg-emerald-400 ring-2 ring-emerald-400/20'}`} />
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isFake ? 'bg-rose-500' : 'bg-emerald-400'}`} />
                     <span className={`font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                       {sample.title}
                     </span>
                   </div>
-                  <span className={`text-[11px] truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <span className={`text-[10px] truncate pl-3.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {sample.subtitle}
                   </span>
                 </button>
@@ -229,7 +294,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-indigo-400" />
               <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                Paste Internship Communication
+                {uploadedFileName ? `Loaded: ${uploadedFileName}` : 'Paste Internship / Job Offer Text'}
               </label>
             </div>
 
@@ -264,9 +329,10 @@ export default function App() {
             onChange={(e) => {
               setInputText(e.target.value);
               setSelectedSampleId('');
+              setUploadedFileName(null);
             }}
             rows={6}
-            placeholder="Paste the offer email, WhatsApp text, Telegram message, or HR letter here..."
+            placeholder="Paste any offer email, job letter body, WhatsApp message, Telegram text, or stipend terms here..."
             className={`w-full p-4 rounded-xl text-xs sm:text-sm font-mono border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y ${
               isDark 
                 ? 'bg-[#060911] border-slate-800 text-slate-200 placeholder-slate-600' 
@@ -351,7 +417,7 @@ export default function App() {
                         : 'border-slate-300 bg-white hover:bg-slate-100 text-slate-800'
                     }`}
                   >
-                    {result.isScam ? 'View Safe Result Demo' : 'View Scam Result Demo'}
+                    {result.isScam ? 'View Safe Sample' : 'View Scam Sample'}
                   </button>
                 </div>
               </div>
@@ -550,7 +616,7 @@ export default function App() {
       }`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
-            © 2026 SafeOffer AI • Simple Internship Protection for Students
+            © 2026 SafeOffer AI • Simple Internship & Job Protection for Students
           </div>
           <div className="flex items-center gap-4 text-[11px]">
             <span>Zero cybersecurity jargon</span>
