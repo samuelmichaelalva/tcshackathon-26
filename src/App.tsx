@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Shield, 
-  ShieldAlert, 
   ShieldCheck, 
   Sun, 
   Moon, 
@@ -16,23 +15,23 @@ import {
   DollarSign, 
   VideoOff, 
   PhoneCall,
-  FileText,
   Upload,
-  Briefcase
+  Key
 } from 'lucide-react';
-import { SAMPLE_OFFERS, analyzeOfferText, AnalysisResult } from './analyzer';
+import { analyzeOfferWithAI, AnalysisResult } from './analyzer';
 import { extractTextFromPDF } from './pdfExtractor';
 import { jsPDF } from 'jspdf';
 
 export default function App() {
   const [isDark, setIsDark] = useState(true);
   const [inputText, setInputText] = useState('');
-  const [selectedSampleId, setSelectedSampleId] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isParsingPdf, setIsParsingPdf] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [checklistState, setChecklistState] = useState<Record<number, boolean>>({ 1: false, 2: false, 3: false });
+  const [customApiKey, setCustomApiKey] = useState<string>('');
+  const [showApiInput, setShowApiInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync dark class on root
@@ -44,24 +43,20 @@ export default function App() {
     }
   }, [isDark]);
 
-  const handleSelectSample = (sample: typeof SAMPLE_OFFERS[0]) => {
-    setSelectedSampleId(sample.id);
-    setInputText(sample.text);
-    setUploadedFileName(null);
-    handleAnalyze(sample.text);
-  };
-
-  const handleAnalyze = (textToAnalyze?: string) => {
+  const handleAnalyze = async (textToAnalyze?: string) => {
     const query = typeof textToAnalyze === 'string' ? textToAnalyze : inputText;
     if (!query.trim()) return;
 
     setIsAnalyzing(true);
-    setTimeout(() => {
-      const res = analyzeOfferText(query);
+    try {
+      const res = await analyzeOfferWithAI(query, customApiKey);
       setResult(res);
       setChecklistState({ 1: false, 2: false, 3: false });
+    } catch (err) {
+      console.error(err);
+    } finally {
       setIsAnalyzing(false);
-    }, 250);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,14 +64,13 @@ export default function App() {
     if (!file) return;
 
     setUploadedFileName(file.name);
-    setSelectedSampleId('');
 
     if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
       setIsParsingPdf(true);
       try {
         const text = await extractTextFromPDF(file);
         setInputText(text);
-        handleAnalyze(text);
+        await handleAnalyze(text);
       } catch (err) {
         alert('Could not parse PDF text directly. Please paste the offer text into the box.');
       } finally {
@@ -84,11 +78,11 @@ export default function App() {
       }
     } else {
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         const text = event.target?.result as string;
         if (text) {
           setInputText(text);
-          handleAnalyze(text);
+          await handleAnalyze(text);
         }
       };
       reader.readAsText(file);
@@ -106,7 +100,6 @@ export default function App() {
       const text = await navigator.clipboard.readText();
       if (text) {
         setInputText(text);
-        setSelectedSampleId('');
         setUploadedFileName(null);
       }
     } catch {
@@ -116,7 +109,6 @@ export default function App() {
 
   const handleClear = () => {
     setInputText('');
-    setSelectedSampleId('');
     setUploadedFileName(null);
     setResult(null);
   };
@@ -166,26 +158,27 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <h1 className="font-bold text-lg tracking-tight">SafeOffer</h1>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                  Free for Students
+                  AI Cyber Defense
                 </span>
               </div>
               <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Internship & Job Offer Scam Detector
+                Student Internship & Job Offer Scam Detector
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => alert("College Placement Cell & TPO advisory: Always report suspicious recruiters claiming fees to tpo@college.edu or National Cyber Helpline 1930.")}
-              className={`hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition ${
+              onClick={() => setShowApiInput(!showApiInput)}
+              className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition ${
                 isDark 
                   ? 'border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-slate-300' 
                   : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700'
               }`}
+              title="Configure Custom AI Key (Optional)"
             >
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              College Safety Shield
+              <Key className="w-3.5 h-3.5 text-indigo-400" />
+              <span>AI API</span>
             </button>
 
             <button
@@ -204,6 +197,24 @@ export default function App() {
         </div>
       </header>
 
+      {/* Optional AI Key Bar */}
+      {showApiInput && (
+        <div className={`border-b px-4 py-2 text-xs flex items-center justify-center gap-2 ${
+          isDark ? 'bg-slate-900/90 border-slate-800 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+        }`}>
+          <span>Gemini API Key (Optional):</span>
+          <input
+            type="password"
+            placeholder="Paste AI API key or leave blank to use Built-in Engine..."
+            value={customApiKey}
+            onChange={(e) => setCustomApiKey(e.target.value)}
+            className={`px-3 py-1 rounded-md text-xs border w-72 focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+              isDark ? 'bg-black border-slate-700 text-slate-200' : 'bg-white border-slate-300 text-slate-800'
+            }`}
+          />
+        </div>
+      )}
+
       {/* Main Container */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
         
@@ -211,80 +222,41 @@ export default function App() {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Instant AI Legitimacy & Fraud Check</span>
+            <span>Instant AI NLP Legitimacy Check</span>
           </div>
           <h2 className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Is your internship or job offer real or a scam?
           </h2>
           <p className={`text-sm sm:text-base max-w-xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Upload your offer letter PDF or paste any recruiter message, WhatsApp chat, or email to verify upfront fees, recruiter legitimacy, and interview standards.
+            Upload your offer letter PDF or paste recruiter communication to verify upfront fees, recruiter legitimacy, and interview standards in seconds.
           </p>
         </div>
 
-        {/* Upload & Preset Options */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          
-          {/* Direct File / PDF Upload Button */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept=".pdf,.txt,.doc,.docx"
-            className="hidden"
-          />
+        {/* Upload Box */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          accept=".pdf,.txt,.doc,.docx"
+          className="hidden"
+        />
 
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className={`p-4 rounded-2xl border text-left flex items-center gap-3.5 transition group ${
-              isDark 
-                ? 'border-indigo-500/30 bg-indigo-950/20 hover:bg-indigo-950/40 hover:border-indigo-500/60' 
-                : 'border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 hover:border-indigo-300'
-            }`}
-          >
-            <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0 group-hover:scale-105 transition">
-              <Upload className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
-                {isParsingPdf ? 'Reading PDF...' : 'Upload Offer Letter'}
-              </div>
-              <div className={`text-xs mt-0.5 truncate ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                {uploadedFileName || 'Select PDF or Text File'}
-              </div>
-            </div>
-          </button>
-
-          {/* Preset Buttons for Demo */}
-          <div className="sm:col-span-2 grid grid-cols-2 gap-2">
-            {SAMPLE_OFFERS.slice(0, 4).map((sample) => {
-              const isSelected = selectedSampleId === sample.id;
-              const isFake = sample.badgeType === 'fake';
-              return (
-                <button
-                  key={sample.id}
-                  onClick={() => handleSelectSample(sample)}
-                  className={`text-left p-2.5 rounded-xl border transition text-xs flex flex-col justify-center ${
-                    isSelected
-                      ? isDark 
-                        ? 'border-indigo-500 bg-indigo-950/50 ring-1 ring-indigo-500' 
-                        : 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500'
-                      : isDark
-                        ? 'border-slate-800 bg-[#0B111E] hover:border-slate-700'
-                        : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isFake ? 'bg-rose-500' : 'bg-emerald-400'}`} />
-                    <span className={`font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                      {sample.title}
-                    </span>
-                  </div>
-                  <span className={`text-[10px] truncate pl-3.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {sample.subtitle}
-                  </span>
-                </button>
-              );
-            })}
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className={`p-6 rounded-2xl border-2 border-dashed cursor-pointer text-center transition group ${
+            isDark 
+              ? 'border-indigo-500/30 bg-indigo-950/10 hover:bg-indigo-950/30 hover:border-indigo-500/60' 
+              : 'border-indigo-200 bg-indigo-50/40 hover:bg-indigo-50/80 hover:border-indigo-300'
+          }`}
+        >
+          <div className="w-12 h-12 mx-auto rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition mb-3">
+            <Upload className="w-6 h-6" />
+          </div>
+          <div className="text-sm font-bold text-indigo-400 uppercase tracking-wider">
+            {isParsingPdf ? 'Extracting text from PDF...' : 'Click to Upload Offer Letter (PDF / DOC / TXT)'}
+          </div>
+          <div className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            {uploadedFileName ? `Selected: ${uploadedFileName}` : 'or paste the offer communication directly below'}
           </div>
         </div>
 
@@ -294,7 +266,7 @@ export default function App() {
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-indigo-400" />
               <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                {uploadedFileName ? `Loaded: ${uploadedFileName}` : 'Paste Internship / Job Offer Text'}
+                {uploadedFileName ? `Document Content: ${uploadedFileName}` : 'Paste Internship / Job Offer Text'}
               </label>
             </div>
 
@@ -328,10 +300,9 @@ export default function App() {
             value={inputText}
             onChange={(e) => {
               setInputText(e.target.value);
-              setSelectedSampleId('');
               setUploadedFileName(null);
             }}
-            rows={6}
+            rows={7}
             placeholder="Paste any offer email, job letter body, WhatsApp message, Telegram text, or stipend terms here..."
             className={`w-full p-4 rounded-xl text-xs sm:text-sm font-mono border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y ${
               isDark 
@@ -343,16 +314,16 @@ export default function App() {
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <div className="flex items-center gap-2 text-xs text-slate-400">
               <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Privacy assured: Analyzed in your browser, never saved or shared.</span>
+              <span>Privacy assured: Analyzed securely in your browser.</span>
             </div>
 
             <button
               onClick={() => handleAnalyze()}
               disabled={isAnalyzing || !inputText.trim()}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Shield className="w-4 h-4" />
-              <span>{isAnalyzing ? 'Analyzing Offer...' : 'Check Offer Safety'}</span>
+              <span>{isAnalyzing ? 'AI Evaluating Offer...' : 'Check Offer Safety'}</span>
             </button>
           </div>
         </div>
@@ -406,19 +377,6 @@ export default function App() {
                       {result.verdictSubtitle}
                     </p>
                   </div>
-                </div>
-
-                <div className="flex sm:flex-col items-center justify-end gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => handleSelectSample(result.isScam ? SAMPLE_OFFERS[2] : SAMPLE_OFFERS[0])}
-                    className={`text-xs font-semibold px-4 py-2 rounded-xl border transition ${
-                      isDark
-                        ? 'border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200'
-                        : 'border-slate-300 bg-white hover:bg-slate-100 text-slate-800'
-                    }`}
-                  >
-                    {result.isScam ? 'View Safe Sample' : 'View Scam Sample'}
-                  </button>
                 </div>
               </div>
             </div>

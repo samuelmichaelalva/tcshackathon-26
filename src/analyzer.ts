@@ -1,12 +1,3 @@
-export interface SampleOffer {
-  id: string;
-  badge: string;
-  badgeType: 'fake' | 'safe';
-  title: string;
-  subtitle: string;
-  text: string;
-}
-
 export interface AnalysisResult {
   isScam: boolean;
   verdictTitle: string;
@@ -40,66 +31,79 @@ export interface AnalysisResult {
   }[];
 }
 
-export const SAMPLE_OFFERS: SampleOffer[] = [
-  {
-    id: 'sample-1',
-    badge: 'Sample 1: Paid Deposit',
-    badgeType: 'fake',
-    title: 'Sample 1: Paid Deposit',
-    subtitle: '₹2,500 laptop collateral',
-    text: `Dear Candidate,
+export async function analyzeOfferWithAI(text: string, userApiKey?: string): Promise<AnalysisResult> {
+  const apiKey = userApiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
 
-Congratulations! You have been selected as a Software Intern at TCS Digital.
-Stipend: ₹35,000/month (Remote).
+  if (apiKey) {
+    try {
+      const prompt = `You are SafeOffer AI, an expert Cyber Defense and Recruitment Fraud Detector for college students.
+Analyze the following internship or job offer text and determine if it is a SCAM (Fake) or LEGITIMATE (Safe).
 
-To receive your corporate laptop and security tokens, please deposit a refundable security fee of ₹2,500 to UPI ID: tcscareers.assets@okaxis within 12 hours.`
+Offer text to evaluate:
+"""
+${text}
+"""
+
+Return ONLY a valid JSON object with NO markdown formatting matching this exact schema:
+{
+  "isScam": boolean,
+  "verdictTitle": string (e.g. "Stay Safe: This is a Known Student Scam" or "Legitimate & Safe Offer Pattern Detected"),
+  "verdictSubtitle": string (brief 1-sentence explanation),
+  "threatLevel": "HIGH_RISK_SCAM" or "SAFE_LEGITIMATE",
+  "facts": {
+    "feeDemand": {
+      "isFlagged": boolean,
+      "status": string (e.g. "⚠️ ₹2,500 Requested" or "✅ Free / Zero Deposit Policy"),
+      "details": string,
+      "ruleText": string
+    },
+    "senderEmail": {
+      "isFlagged": boolean,
+      "status": string (e.g. "⚠️ Generic @gmail.com" or "✅ Official Corporate Domain"),
+      "details": string,
+      "ruleText": string
+    },
+    "interviewProcess": {
+      "isFlagged": boolean,
+      "status": string (e.g. "⚠️ Selected without Interview" or "✅ Formal Interview Conducted"),
+      "details": string,
+      "ruleText": string
+    }
   },
-  {
-    id: 'sample-2',
-    badge: 'Sample 2: Telegram Scam',
-    badgeType: 'fake',
-    title: 'Sample 2: Telegram Scam',
-    subtitle: 'No interview required',
-    text: `URGENT HIRING: Data Entry & AI Content Operations Intern.
-Salary: ₹45,000 per month. Work from home 2 hours daily.
+  "reasons": string[],
+  "checklist": [
+    { "id": 1, "text": string, "completed": false },
+    { "id": 2, "text": string, "completed": false },
+    { "id": 3, "text": string, "completed": false }
+  ]
+}`;
 
-No technical interview or experience required. Direct selection for freshers!
-Send your Aadhaar card copy, bank passbook, and resume to HR coordinator on Telegram @TechRecruiterDirect within 3 hours to confirm your seat.`
-  },
-  {
-    id: 'sample-3',
-    badge: 'Sample 3: TCS Offer',
-    badgeType: 'safe',
-    title: 'Sample 3: TCS Offer',
-    subtitle: 'Official @tcs.com hiring',
-    text: `Dear Ananya,
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json' }
+        })
+      });
 
-We are delighted to extend an offer for the role of Graduate Technology Intern at Tata Consultancy Services (TCS), following your successful technical interview and assessment on August 20.
-
-Stipend: ₹18,000/month.
-Location: Mumbai / Hybrid.
-
-Please log in to your official TCS NextStep portal (nextstep.tcs.com) using your registered Reference ID to view and accept your offer letter. Official correspondence: campus.talent@tcs.com.
-Note: TCS never solicits registration, equipment, or training fees at any stage of hiring.`
-  },
-  {
-    id: 'sample-4',
-    badge: 'Sample 4: Genuine Startup',
-    badgeType: 'safe',
-    title: 'Sample 4: Genuine Startup',
-    subtitle: 'Direct founder talk, free',
-    text: `Hi Samuel,
-
-Great chatting with you and the team during the code walkthrough on Wednesday! We loved your React project demo and want to offer you a 3-month Frontend Engineering Internship at CloudScale AI.
-
-Stipend: ₹20,000/month.
-Start Date: Next Monday.
-
-Please review the attached offer letter and reply with your acceptance by Friday. Official contact: careers@cloudscale.ai.`
+      if (res.ok) {
+        const data = await res.json();
+        const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawJson) {
+          return JSON.parse(rawJson);
+        }
+      }
+    } catch (e) {
+      console.warn('AI API fallback to NLP Heuristic Engine:', e);
+    }
   }
-];
 
-export function analyzeOfferText(text: string): AnalysisResult {
+  // Robust Heuristic Engine fallback (guarantees 100% demo stability with 0 errors)
+  return analyzeOfferLocally(text);
+}
+
+export function analyzeOfferLocally(text: string): AnalysisResult {
   const lower = text.toLowerCase();
 
   // 1. Fee detection
@@ -108,7 +112,6 @@ export function analyzeOfferText(text: string): AnalysisResult {
   const feeDetected = hasFeeKeywords && !mentionsZeroFee;
 
   let feeAmountMatch = text.match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i);
-  let feeStr = feeDetected ? (feeAmountMatch ? `₹${feeAmountMatch[1]} Requested` : 'Deposit / Fee Demanded') : 'Free / No Fees Required';
 
   // 2. Email / Domain detection
   const hasGmail = /@(?:gmail|yahoo|outlook|hotmail|rediffmail|protonmail)\.com/i.test(text);
@@ -121,7 +124,6 @@ export function analyzeOfferText(text: string): AnalysisResult {
   const interviewConducted = /technical\s+interview|assessment|chatting with you|code walkthrough|round/i.test(text);
   const interviewSuspicious = noInterviewKeywords || (!interviewConducted && feeDetected);
 
-  // 4. Overall scam verdict
   const isScam = feeDetected || emailSuspicious || interviewSuspicious || hasTelegram;
 
   if (isScam) {
@@ -136,7 +138,7 @@ export function analyzeOfferText(text: string): AnalysisResult {
           status: feeDetected ? (feeAmountMatch ? `⚠️ ₹${feeAmountMatch[1]} Requested` : '⚠️ Fee / Deposit Requested') : '✅ No Explicit Fee Demand',
           details: feeDetected
             ? 'Legitimate companies never ask interns to pay for laptops, registration, security deposits, or gate passes.'
-            : 'No direct payment request detected in the text, but remaining factors remain high risk.',
+            : 'No direct payment request detected in the text, but other factors indicate high risk.',
           ruleText: 'Rule: Genuine jobs pay you, never the other way around.'
         },
         senderEmail: {
