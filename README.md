@@ -355,50 +355,15 @@ npm run preview
 
 ## 12. Team & Contributions
 
-SafeOffer AI was conceptualized, built, and presented for **TCS Hackathon 2026** by a five-member team, qualifying as one of the **Top 7 Finalist Teams** in the competition.
+SafeOffer AI was developed during **TCS Hackathon 2026** under the **AI & Cyber Defense Track** (Problem Statement: Student Recruitment & Internship Fraud Detection), qualifying as one of the **Top 7 Finalist Teams**.
 
----
-
-### Core Team
-
-**Samuel Michael Alva — Team Lead & Application Developer**
-
-Samuel served as the team lead and single-handedly engineered the technical architecture and full-stack implementation of SafeOffer AI. His contributions span every subsystem of the codebase, as verified by the repository commit history:
-
-* **Dual-Engine Fraud Architecture** — Designed and implemented the hybrid detection framework in [`src/analyzer.ts`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/analyzer.ts): the cloud-based Google Gemini 1.5 Flash LLM integration with strict JSON schema parsing, paired with a resilient, zero-latency deterministic heuristic rule matrix fallback.
-* **Forensic Pattern & Rule Engineering** — Authored the comprehensive regex detection engine identifying upfront fee demands (with zero-deposit negation logic), unauthorized Telegram redirects, recruiter webmail impersonation (`@gmail`, `@yahoo`, `@outlook`), unilateral hiring without interview evaluation, and artificial urgency triggers.
-* **Document Ingestion & OCR Pipeline** — Engineered [`src/pdfExtractor.ts`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/pdfExtractor.ts), integrating Mozilla `pdfjs-dist` for digital vector PDF text extraction and orchestrating high-resolution HTML5 canvas rendering (scale 2.0) with an asynchronous `tesseract.js` worker for scanned documents, camera photos, and image files with real-time recognition progress telemetry.
-* **Forensic Audit PDF Generator** — Built the client-side audit reporting engine in [`src/App.tsx`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/App.tsx) utilizing `jspdf`, structuring timestamped forensic evidence, factor statuses, and student action checklists into exportable PDFs.
-* **User Interface & State Management** — Developed the complete React 18 application interface in [`src/App.tsx`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/App.tsx): reactive file dropzone, clipboard paste synchronization, light/dark mode theming with Tailwind CSS, high-contrast decision banners, and tri-factor forensic evidence cards.
-* **Repository & Release Management** — Sole committer across all commits in the project repository (`git log --all --format="%an | %s"`), managing the prototype development, dependency configuration, and production builds.
-
----
-
-**Justin Sunil — Hackathon Team Member**
-
-Justin contributed to the collaborative problem definition, threat modeling research, and student persona requirements during TCS Hackathon 2026. The team's research into prevalent campus recruitment scam vectors and placement cell workflows reflects collective analysis during the hackathon.
-
----
-
-**Arya Gunjotikar — Hackathon Team Member**
-
-Arya contributed to problem formulation, user journey scoping, and research into recruitment communication channels (Telegram groups, WhatsApp hiring spams) targeted at university graduates during the competition ideation phase.
-
----
-
-**Renata Belli — Hackathon Team Member**
-
-Renata contributed to team ideation, validation criteria scoping, and the preparation of hackathon pitch materials and slide presentations for the TCS Hackathon 2026 judging panel.
-
----
-
-**Ritu Shinde — Hackathon Team Member**
-
-Ritu contributed to the domain evaluation research, comparative analysis of genuine enterprise recruitment processes versus deceptive hiring practices, and collaborative pitch asset development.
-
----
-
-> **Codebase note:** All technical implementation — React components, TypeScript algorithms, Gemini API integration, heuristic rule matrices, PDF/OCR extraction logic, Tailwind CSS styling, and documentation — was authored by Samuel Michael Alva, as verified by the Git commit history (`git log --all --format="%an | %s"`). No code commits from other team members are present in the repository.
+| Member | Role | Responsibilities |
+| :--- | :--- | :--- |
+| **Samuel Michael Alva** | **Team Lead & Application Developer** | Project coordination, frontend architecture, Gemini API & heuristic engine implementation, and OCR/PDF pipeline. |
+| **Justin Sunil** | **Team Member** | Problem research, threat modeling, and recruitment scam patterns. |
+| **Arya Gunjotikar** | **Team Member** | Communication channel analysis (Telegram/webmail fraud) and user workflow scoping. |
+| **Renata Belli** | **Team Member** | Solution evaluation criteria and hackathon presentation deck. |
+| **Ritu Shinde** | **Team Member** | Enterprise hiring benchmark research and pitch asset preparation. |
 
 ---
 
