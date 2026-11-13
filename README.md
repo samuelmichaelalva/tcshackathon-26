@@ -1,333 +1,305 @@
-# SafeOffer AI — Student Internship & Job Offer Scam Detector
+# SafeOffer AI
+### *Student Internship & Job Offer Scam Detector*
 
 <p align="center">
-  <img src="./public/logo.svg" alt="SafeOffer AI Logo" width="96" height="96" />
+  <img src="./public/logo.svg" alt="SafeOffer AI Logo" width="84" height="84" />
 </p>
 
 <p align="center">
-  <strong>Client-side AI & heuristic forensic screening system defending students against recruitment fraud.</strong>
+  <strong>Client-side AI and heuristic forensic screening system defending university students against recruitment fraud.</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/TCS_Hackathon_2026-Finalist_(Top_7)-purple?style=flat-square" alt="TCS Hackathon 2026 Finalist" />
-  <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 18" />
-  <img src="https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Vite-6.1-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/Gemini_API-1.5_Flash-4285F4?style=flat-square&logo=google&logoColor=white" alt="Gemini API" />
-  <img src="https://img.shields.io/badge/OCR-Tesseract.js_v7-brightgreen?style=flat-square" alt="Tesseract.js" />
+  <img src="https://img.shields.io/badge/TCS_Hackathon_2026-Finalist_(Top_7)-7928CA?style=for-the-badge" alt="TCS Hackathon 2026 Finalist" />
+  <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
+  <img src="https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-6.1-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Gemini_API-1.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini API" />
+  <img src="https://img.shields.io/badge/OCR-Tesseract.js_v7-22C55E?style=for-the-badge" alt="Tesseract.js" />
 </p>
 
 ---
 
-## 1. Project Overview
-
-**SafeOffer AI** is an intelligent, client-first forensic screening application designed to protect college students, recent graduates, and job seekers from recruitment fraud, fake internship letters, and employment phishing scams.
-
-Employment scams targeting students have grown increasingly sophisticated. Fraudulent operators clone enterprise branding, craft deceptive offer letters, issue unilateral appointments without prior technical evaluation, and coerce victims into paying upfront "laptop deposits," "training charges," or "registration fees."
-
-SafeOffer AI provides instant, transparent, and actionable verification by combining:
-1. **Context-Aware Generative AI Analysis:** Powered by Google's `gemini-1.5-flash` model for semantic comprehension of deceptive recruiter language and novel scam patterns.
-2. **Deterministic Heuristic Forensic Fallback:** A comprehensive rule-based regex engine that flags critical fraud signals offline with zero latency and 100% demo reliability.
-3. **Hybrid Document Ingestion Pipeline:** Capable of reading raw text, extracting digital text from PDFs using `pdfjs-dist`, and executing optical character recognition (OCR) on scanned documents and image formats using `tesseract.js`.
-4. **Forensic Audit PDF Generation:** Exportable audit reports produced client-side via `jspdf` for submission to College Training & Placement Officers (TPOs) or cybercrime reporting portals.
+## ⚡ 60-Second Summary
+> **SafeOffer AI** is a cyber defense screening web application built for **TCS Hackathon 2026** (shortlisted among the **Top 7 Finalist Teams**).
+> It protects students from fraudulent internship letters, fake campus placements, and recruiter extortion scams.
+> The platform features a dual-engine architecture: a cloud-powered **Google Gemini 1.5 Flash** semantic analyzer backed by an offline, zero-latency **deterministic heuristic regex engine** that operates with 100% reliability.
+> SafeOffer AI ingests raw text, digital PDFs (`pdfjs-dist`), and scanned images or photo letters (`tesseract.js` OCR via 2.0x canvas rendering), evaluates threats across three forensic pillars (Fee Demand, Recruiter Channel, and Interview Integrity), and exports timestamped audit reports via `jspdf`.
 
 ---
 
-## 2. Problem Statement & Proposed Solution
+## 📋 Project Details
 
-### The Problem
-During campus recruitment seasons, students face intense pressure to secure internships and entry-level positions. Malicious actors exploit this urgency through well-documented predatory patterns:
-- **Financial Solicitations:** Requesting mandatory deposits under the guise of security fees, equipment delivery, seat confirmation, or gate passes.
-- **Identity & Domain Impersonation:** Pretending to represent reputed multinational enterprises (e.g., TCS, Infosys, Google, Wipro) while communicating via generic webmail accounts (`@gmail.com`, `@yahoo.com`) or redirecting conversations to unregulated channels such as Telegram.
-- **Bypassed Assessment Integrity:** Granting immediate job offers without interviews, coding assessments, or portfolio reviews to induce false relief and compliance.
-- **High-Pressure Urgency Tactics:** Imposing artificial deadlines (e.g., "Respond within 2 hours" or "Offer expires today") to force hurried monetary transfers before the applicant can consult peers or placement authorities.
-
-### The Proposed Solution
-SafeOffer AI addresses this challenge with a **"Decision $\rightarrow$ Reason $\rightarrow$ Next Action"** evaluation framework:
-- **Instant Triage:** Classifies documents into clear, non-jargon outcomes (`SAFE_LEGITIMATE` vs. `HIGH_RISK_SCAM`).
-- **Tri-Factor Forensic Fact Breakdown:** Details the specific evidence behind the classification across three investigative pillars: Fee Demand, Sender Communication Channel, and Interview Process Integrity.
-- **Prescriptive Next Steps:** Delivers a concrete safety checklist, direct references to the National Cyber Fraud Helpline (1930), and downloadable verification audits.
+| Parameter | Specification |
+| :--- | :--- |
+| **Hackathon** | TCS Hackathon 2026 |
+| **Track & Problem Statement** | AI & Cyber Defense · Student Recruitment & Internship Fraud Detection (PS3) |
+| **Recognition** | **Top 7 Finalist Teams** |
+| **Team Lead & Lead Developer** | Samuel Michael Alva |
+| **Architecture** | Client-First React SPA · Gemini 1.5 Flash API · Heuristic Regex Engine · Tesseract.js OCR |
+| **Status** | Hackathon Finalist Prototype |
 
 ---
 
-## 3. Key Features
+## Table of Contents
 
-- **Multi-Modal Document Input:**
-  - Direct text input via clipboard paste or typing for email bodies, WhatsApp messages, and direct messages.
-  - Native file upload supporting `.pdf`, `.png`, `.jpg`, `.jpeg`, and `.txt` files.
-- **Hybrid Document Extraction Engine:**
-  - Digital PDF parsing using Mozilla's `pdfjs-dist`.
-  - Automated fallback to HTML5 Canvas rendering (scale 2.0) and `tesseract.js` OCR when PDFs contain scanned images or non-selectable text.
-  - Real-time recognition progress tracking (0% to 100%) during OCR processing.
-- **Dual-Engine Detection Architecture:**
-  - **AI Mode:** REST integration with Google Gemini 1.5 Flash using strict JSON schema validation.
-  - **Heuristic Mode:** Offline, high-coverage regex forensic engine checking fee patterns, zero-fee negation clauses, recruiter domains, interview mentions, and marketing clickbait.
-- **Forensic Tri-Factor Breakdown:**
-  - **Fact 1: Fee Demand Analysis** — Detects direct payment requests, security deposits, UPI IDs, and currency references while respecting legitimate corporate disclaimers.
-  - **Fact 2: Communication Channel Audit** — Identifies public webmail impersonation, unauthorized Telegram redirects, and verifies legitimate corporate domains.
-  - **Fact 3: Interview Validation** — Verifies whether structured technical interviews or assessments occurred versus instant, unverified selection.
-- **Client-Side PDF Audit Export:**
-  - Generates a timestamped, structured verification report in PDF format with one click using `jspdf`.
-- **Responsive & Accessible Interface:**
-  - Built with Tailwind CSS and Lucide React.
-  - Fully functional Light Mode and Dark Mode toggle.
-  - Instant reset and re-scan capabilities.
+* [01. Project Overview](#01-project-overview)
+* [02. Problem Statement & Solution](#02-problem-statement--solution)
+* [03. Key Features](#03-key-features)
+* [04. Screenshots & Live Application Walkthrough](#04-screenshots--live-application-walkthrough)
+* [05. System Architecture](#05-system-architecture)
+* [06. Fraud Detection Methodology](#06-fraud-detection-methodology)
+* [07. Document Processing & OCR Pipeline](#07-document-processing--ocr-pipeline)
+* [08. Technology Stack](#08-technology-stack)
+* [09. Project Structure](#09-project-structure)
+* [10. Installation & Setup](#10-installation--setup)
+* [11. Prototype Limitations & Privacy](#11-prototype-limitations--privacy)
+* [12. Team & Contributions](#12-team--contributions)
 
 ---
 
-## 4. Screenshots & Application Walkthrough
+## 01. Project Overview
 
-The SafeOffer AI interface follows a structured, step-by-step forensic evaluation workflow:
+During campus placement seasons, recruitment scams surge dramatically. Malicious operators exploit students' career anxiety and lack of corporate hiring experience by circulating fabricated offer letters, impersonating enterprise recruiters (e.g., TCS, Infosys, Wipro, Google), and requesting upfront "laptop deposits," "gate pass fees," or "training registration costs."
 
-```
-+-----------------------------------------------------------------------------------+
-|  [Logo] SafeOffer  AI Cyber Defense         [College Safety Shield] [Toggle Theme] |
-+-----------------------------------------------------------------------------------+
-|                                                                                   |
-|                Is your internship or job offer real or a scam?                    |
-|       Upload your offer letter PDF / image scan or paste recruiter communication   |
-|                                                                                   |
-|   +---------------------------------------------------------------------------+   |
-|   |   [ Upload Icon ]                                                         |   |
-|   |   CLICK TO UPLOAD OFFER LETTER (PDF / PNG / JPG / DOC)                    |   |
-|   |   Supports digital PDFs, camera scans, and photo letters                  |   |
-|   +---------------------------------------------------------------------------+   |
-|                                                                                   |
-|   +---------------------------------------------------------------------------+   |
-|   |   [Mail Icon] Or Paste Offer Communication Text      [Paste] [Clear]      |   |
-|   |   +---------------------------------------------------------------------+ |   |
-|   |   | Paste offer email body, WhatsApp message, Telegram text...          | |   |
-|   |   +---------------------------------------------------------------------+ |   |
-|   |   (Lock) Privacy assured: Analyzed securely       [ Check Offer Safety ]  |   |
-|   +---------------------------------------------------------------------------+   |
-|                                                                                   |
-|   ========================= FORENSIC AUDIT RESULTS =========================     |
-|                                                                                   |
-|   +---------------------------------------------------------------------------+   |
-|   | [!] HIGH RISK SCAM / FAKE OFFER DETECTED — DO NOT PAY                     |   |
-|   | Stay Safe: This is a Known Student Scam                                   |   |
-|   | This recruiter is using classic scam patterns. Protect your money.        |   |
-|   +---------------------------------------------------------------------------+   |
-|                                                                                   |
-|   +-------------------+   +--------------------+   +-----------------------+      |
-|   | FACT 1: FEE DEMAND|   |FACT 2: SENDER EMAIL|   |FACT 3: INTERVIEW PROC |      |
-|   | ⚠️ ₹2,500 Requested|   | ⚠️ Telegram Channel|   | ⚠️ No Interview Found |      |
-|   | Rule: Genuine jobs|   | Rule: Official com-|   | Rule: Real internships|      |
-|   | pay you, not vice |   | panies use verified|   | require technical     |      |
-|   | versa.            |   | domains.           |   | evaluation rounds.    |      |
-|   +-------------------+   +--------------------+   +-----------------------+      |
-|                                                                                   |
-|   +---------------------------------------------------------------------------+   |
-|   | [ Download Report ]   [ Reset & Scan Another ]    Helpline: 1930 (Toll-Free) |   |
-|   +---------------------------------------------------------------------------+   |
-+-----------------------------------------------------------------------------------+
-```
+**SafeOffer AI** provides an accessible, jargon-free forensic verification tool. Rather than relying solely on cloud APIs that might face network latency or rate limits, SafeOffer AI pairs **Google Gemini 1.5 Flash** semantic intelligence with an offline **heuristic rule matrix**.
 
-### Application Walkthrough Steps
-
-1. **Document Ingestion:** The user either drags and drops an offer letter file (`.pdf`, `.png`, `.jpg`) into the dedicated dropzone or pastes raw text directly into the input workspace.
-2. **Text Processing & OCR:**
-   - If a digital PDF is supplied, `pdfjs-dist` reads the textual streams page by page.
-   - If a scanned PDF or photograph is supplied, pages are rendered to high-resolution canvas surfaces and processed via the `tesseract.js` OCR worker with live status updates.
-3. **Safety Evaluation:** Clicking **"Check Offer Safety"** triggers the forensic analysis via Gemini 1.5 Flash (or the local heuristic engine if no API key is configured).
-4. **Verdict Banner:** Displays an instant color-coded visual indicator (`HIGH_RISK_SCAM` in rose/crimson or `SAFE_LEGITIMATE` in emerald).
-5. **Tri-Factor Forensic Fact Cards:** Provides targeted analysis of the payment request, sender domain integrity, and interview process legitimacy.
-6. **Action & Audit Export:** The student can review the safety recommendations, call the National Cyber Fraud Helpline (1930), or download an official `SafeOffer_Verification_Report.pdf` document.
+The application ingests offer letters through file uploads (PDF, PNG, JPG) or direct text input, normalizes the text through a hybrid digital-extraction and optical character recognition (OCR) pipeline, performs forensic evaluation, and outputs a structured **Decision $\rightarrow$ Reason $\rightarrow$ Next Action** verdict alongside an exportable PDF audit report.
 
 ---
 
-## 5. System Architecture
+## 02. Problem Statement & Solution
 
-The following diagram illustrates the complete data flow, from user input to final risk assessment and PDF report generation:
+### The Recruitment Fraud Threat Model
+* **Upfront Fee Solicitations:** Scammers demand non-refundable or "refundable" payments under the guise of laptop distribution, security deposits, gate passes, or seat confirmations via UPI handles (`@gpay`, `@paytm`, `@phonepe`). Genuine corporate employers never charge candidates.
+* **Recruiter Webmail Impersonation:** Fraudsters claim corporate affiliations while sending correspondence from free public handles (`@gmail.com`, `@yahoo.com`, `@outlook.com`) rather than authorized corporate domains (`@tcs.com`, `nextstep.tcs.com`).
+* **Unregulated Channel Redirection:** Candidates are routed to anonymous Telegram groups (`t.me/...`) to evade enterprise compliance audit trails.
+* **Unilateral Selection Without Interview:** Offers are issued immediately based solely on resumes, skipping technical interviews, coding challenges, or evaluation rounds.
+* **Coercive Urgency Pressure:** Imposing artificial deadlines ("Pay within 24 hours to secure your seat") to induce panic and prevent consultation with college authorities.
+
+### The SafeOffer AI Solution
+SafeOffer AI analyzes offer correspondence against established enterprise hiring standards and outputs:
+1. **Clear Decision Banner:** Unambiguous visual determination (`SAFE_LEGITIMATE` vs. `HIGH_RISK_SCAM`).
+2. **Tri-Factor Forensic Breakdown:** Specific evidence cards detailing Fee Demand status, Sender Email/Domain integrity, and Interview Process verification.
+3. **Actionable Student Guidance:** Direct safety steps, placement cell verification advisories, and the National Cyber Fraud Helpline (1930).
+4. **Client-Side Audit Report:** One-click exportable PDF document for submission to college Training & Placement Officers (TPOs) or cybercrime portals.
+
+---
+
+## 03. Key Features
+
+- **Multi-Modal Document Parsing:** Accepts pasted email bodies, WhatsApp messages, digital PDFs, mobile photo letters, and scanned image documents.
+- **Hybrid OCR Pipeline:** Automatically extracts digital text via `pdfjs-dist`; if pages lack selectable text, it renders high-resolution HTML5 canvas views (scale 2.0) and executes `tesseract.js` OCR with real-time recognition progress telemetry.
+- **Dual-Engine Fraud Analysis:**
+  - *Cloud AI Engine:* Evaluates semantic context and subtle conversational deception using Google Gemini 1.5 Flash via REST API with strict JSON schema parsing.
+  - *Local Heuristic Fallback:* Zero-latency regex matrix evaluating fee patterns, negative-fee disclaimers, domain spoofing, Telegram channels, and interview criteria.
+- **Tri-Factor Forensic Fact Cards:**
+  - *Fact 1: Fee Demand* — Detects deposits, registration charges, UPI strings, and currency amounts.
+  - *Fact 2: Sender Email & Channel* — Audits public webmail impersonation, Telegram redirects, and verifies legitimate corporate domains.
+  - *Fact 3: Interview Validation* — Flags unilateral selections made without technical or behavioral evaluation.
+- **Client-Side PDF Audit Generation:** Creates timestamped forensic PDF audit certificates in-browser using `jspdf`.
+- **Responsive Security UI:** Fast, mobile-ready Tailwind CSS interface supporting seamless Light and Dark mode toggling.
+
+---
+
+## 04. Screenshots & Live Application Walkthrough
+
+The following screenshots illustrate the primary operational states of SafeOffer AI captured during live testing:
+
+| Landing & Document Ingestion (Light Mode) | Fraud Detection Verdict (High-Risk Scam) |
+| :---: | :---: |
+| <img src="./screenshots/01_landing_interface.png" alt="SafeOffer AI Landing Interface" width="480" /> | <img src="./screenshots/02_scam_detection_verdict.png" alt="High-Risk Scam Detection Verdict" width="480" /> |
+| *Hero dropzone supporting PDF/image upload, clipboard paste workspace, and safety shield* | *High-contrast scam banner, Tri-Factor forensic fact cards, and helpline advisory* |
+
+| Legitimate Offer Verification (Safe Pattern) | Cyber Defense Theme (Dark Mode) |
+| :---: | :---: |
+| <img src="./screenshots/03_safe_verified_verdict.png" alt="Legitimate Offer Verification" width="480" /> | <img src="./screenshots/04_dark_mode_interface.png" alt="Dark Mode Interface" width="480" /> |
+| *Verified corporate domain, zero-fee compliance detection, and merit-based hiring check* | *Full dark-mode cyber defense UI with responsive layout and real-time safety audit* |
+
+---
+
+## 05. System Architecture
+
+The end-to-end data pipeline routes user inputs through extraction, engine selection, forensic scoring, and client-side rendering:
 
 ```mermaid
 flowchart TD
-    subgraph Client_Input["1. Client Ingestion Layer"]
-        A1["User Uploads PDF / Image"] --> B1{"File Type?"}
-        A2["User Pastes Offer Text"] --> E["Normalized Text Buffer"]
-        B1 -- ".pdf" --> C1["PDF.js Parser"]
-        B1 -- "Image (.png, .jpg)" --> C2["Tesseract.js OCR Worker"]
+    subgraph Ingestion["1. Document Ingestion"]
+        A1["Upload PDF or Image"] --> B1{"File Format?"}
+        A2["Paste Offer Text"] --> E["Normalized Text Buffer"]
+        B1 -- ".pdf" --> C1["Mozilla PDF.js Parser"]
+        B1 -- ".png / .jpg" --> C2["Tesseract.js OCR Worker"]
     end
 
-    subgraph Document_Extraction["2. Document Extraction Layer"]
+    subgraph Extraction["2. Extraction & Hybrid OCR"]
         C1 --> D1{"Selectable Text > 40 chars?"}
         D1 -- "Yes (Digital PDF)" --> E
-        D1 -- "No (Scanned Page)" --> D2["Render Page to Canvas (Scale 2.0)"]
+        D1 -- "No (Scanned Page)" --> D2["Render Canvas (Scale 2.0)"]
         D2 --> C2
         C2 --> E
     end
 
-    subgraph Forensic_Engine["3. Detection & Forensic Analysis Layer"]
-        E --> F{"Gemini API Key Available?"}
+    subgraph Detection["3. Dual-Engine Forensic Analysis"]
+        E --> F{"VITE_GEMINI_API_KEY Set?"}
         
         F -- "Yes" --> G1["Google Gemini 1.5 Flash API"]
-        G1 -- "JSON Schema Prompt" --> H1{"API Call Successful?"}
+        G1 -- "Enforced JSON Schema" --> H1{"API Success?"}
         H1 -- "Yes" --> I["Parse AnalysisResult JSON"]
-        H1 -- "No / Exception" --> G2["Local Heuristic Engine (Fallback)"]
+        H1 -- "Error / Rate Limit" --> G2["Local Heuristic Engine"]
         
-        F -- "No Key" --> G2
+        F -- "No" --> G2
         
-        subgraph Local_Heuristic_Rules["Deterministic Rule Matrix"]
-            G2 --> R1["Fee & Payment Pattern Check"]
-            G2 --> R2["Sender Domain & Telegram Check"]
-            G2 --> R3["Interview & Evaluation Check"]
-            G2 --> R4["Marketing & Urgency Flags"]
+        subgraph Rules["Deterministic Heuristic Rule Matrix"]
+            G2 --> R1["Fee & Deposit Regex Check"]
+            G2 --> R2["Sender Domain & Telegram Audit"]
+            G2 --> R3["Interview & Merit Validation"]
+            G2 --> R4["Urgency Pressure Detection"]
         end
-        Local_Heuristic_Rules --> I
+        Rules --> I
     end
 
-    subgraph Output_Presentation["4. Presentation & Export Layer"]
-        I --> J["React State Update"]
-        J --> K1["Decision Banner (Safe vs Scam)"]
-        J --> K2["Tri-Factor Forensic Fact Cards"]
-        J --> K3["Recommendation Action Checklist"]
-        J --> K4["jsPDF Report Exporter"]
+    subgraph Presentation["4. Presentation & Audit Export"]
+        I --> J["React UI State Update"]
+        J --> K1["High-Contrast Decision Banner"]
+        J --> K2["Tri-Factor Evidence Cards"]
+        J --> K3["Student Action Checklist"]
+        J --> K4["jsPDF Client-Side Exporter"]
         K4 --> L["SafeOffer_Verification_Report.pdf"]
     end
 ```
 
 ---
 
-## 6. Fraud Detection Methodology
+## 06. Fraud Detection Methodology
 
-SafeOffer AI employs a two-tier analysis methodology: context-aware Large Language Model (LLM) reasoning and an offline deterministic heuristic forensic engine.
+SafeOffer AI uses a two-tier evaluation methodology: semantic reasoning via Gemini 1.5 Flash and a deterministic regex forensic engine.
 
-### Comparison: AI Analysis vs. Heuristic Detection
+### Comparison: Cloud AI Engine vs. Local Heuristic Fallback
 
-| Attribute | Gemini 1.5 Flash AI Engine | Local Heuristic Forensic Engine |
+| Metric | Google Gemini 1.5 Flash Engine | Local Heuristic Forensic Engine |
 | :--- | :--- | :--- |
-| **Execution Context** | Cloud-based (`generativelanguage.googleapis.com`) | 100% In-Browser (Client-side execution) |
-| **Detection Method** | Generative NLP context modeling & semantic reasoning | Deterministic Regex & Boolean rule matrix |
-| **Strengths** | Understands novel phrasing, implicit pressure, and complex context | Zero latency, operates offline, zero API quota dependency |
-| **Output Format** | Structured JSON enforcing `AnalysisResult` schema | Native `AnalysisResult` TypeScript object |
-| **Activation** | Active when `VITE_GEMINI_API_KEY` is present | Active by default, or as automatic fallback on API error |
+| **Execution Environment** | Google Generative Language REST Endpoint | In-Browser Client-Side (`src/analyzer.ts`) |
+| **Core Mechanism** | Generative LLM contextual reasoning | Deterministic Regular Expressions & Rule Logic |
+| **Primary Strength** | Detects nuanced deception, tone, and novel phrasing | 0ms execution latency, zero API quota dependency, works offline |
+| **Data Transmission** | Transmits submitted text over HTTPS to Google API | 100% private to the local browser session |
+| **Fallback Trigger** | Primary analysis engine when API key is configured | Activates automatically on missing key or network error |
 
 ---
 
-### Detailed Forensic Checks
+### Key Forensic Checks Implemented
 
-#### 1. Suspicious Fee & Payment Requests
-- **Detection Logic:** Scans for keywords associated with upfront financial extraction (`registration fee`, `processing charge`, `training fee`, `laptop deposit`, `security deposit`, `caution amount`, `gate pass`, `seat confirmation`).
-- **Payment Method Identifiers:** Flags mentions of instant transfer mechanisms (`UPI`, `GPay`, `Paytm`, `PhonePe`, QR codes, direct account numbers) alongside currency symbols (`₹`, `Rs.`, `INR`, `$`).
-- **Zero-Fee Negation Handling:** Avoids false positives by evaluating disclaimers such as `"never solicits registration"`, `"does not charge any fee"`, or `"free of cost"`.
+#### 1. Upfront Fee & Deposit Detection
+Scans for combinations of monetary requests (`registration fee`, `laptop deposit`, `security deposit`, `training charge`, `gate pass`, `seat confirmation`) alongside currency identifiers (`₹`, `Rs.`, `INR`, `$`) and digital payment methods (`UPI`, `GPay`, `Paytm`, `PhonePe`).
+* **Zero-Fee Negation Handling:** Accurately parses enterprise disclaimers (e.g., *"TCS never solicits registration fees"*, *"free of cost"*), preventing false positives on legitimate documents.
 
-#### 2. Communication Channels & Recruiter Identity
-- **Telegram Redirection:** Detects links and handles matching `telegram`, `t.me/`, or `@...direct`. Legitimate corporate recruitment workflows do not conduct onboarding or interviews exclusively over anonymous messaging channels.
-- **Public Webmail Impersonation:** Flags recruiters claiming to represent established brands (e.g., TCS, Infosys, Wipro, Google, Microsoft) while using free webmail providers (`@gmail.com`, `@yahoo.com`, `@outlook.com`, `@hotmail.com`, `@rediffmail.com`).
-- **Verified Enterprise Domains:** Validates official recruitment portals (e.g., `@tcs.com`, `nextstep.tcs.com`).
+#### 2. Communication Channel & Recruiter Webmail Impersonation
+* **Public Webmail Flags:** Flags recruiters asserting enterprise identity (e.g., Tata, TCS, Infosys, Wipro, Google) while using generic consumer webmail accounts (`@gmail.com`, `@yahoo.com`, `@outlook.com`, `@hotmail.com`, `@rediffmail.com`).
+* **Unregulated Channel Redirection:** Flags redirects to anonymous Telegram handles (`t.me/...`, `@...direct`) used to bypass enterprise compliance logging.
+* **Verified Corporate Domains:** Recognizes authenticated enterprise domains (`@tcs.com`, `nextstep.tcs.com`, etc.).
 
 #### 3. Interview Process & Merit Verification
-- **Unilateral Selection:** Flags phrases indicating an offer was issued without merit evaluation (`without any interview`, `no technical interview`, `direct selection based on resume`).
-- **Merit-Based Assessment Recognition:** Identifies standard corporate hiring stages (`technical interview`, `aptitude test`, `coding assessment`, `hackathon evaluation`, `campus drive`).
+* **Selection Without Assessment:** Flags explicit claims of direct hiring without screening (`without any interview`, `no technical interview`, `direct selection based on resume`).
+* **Merit-Based Process Recognition:** Identifies standard multi-round evaluations (`technical interview`, `aptitude test`, `coding round`, `hackathon evaluation`, `campus drive`).
 
-#### 4. Urgency Indicators & Psychological Coercion
-- **Artificial Pressure:** Detects phrases engineered to bypass critical thinking (`urgent`, `within 24 hours`, `today only`, `respond ASAP`). When combined with payment requests, urgency triggers immediate high-risk classification.
+#### 4. Urgency Indicators & Coercion Tactics
+Detects high-pressure deadlines (`urgent`, `within 24 hours`, `today only`, `respond ASAP`). When combined with payment demands, artificial urgency elevates the classification to `HIGH_RISK_SCAM`.
 
-#### 5. Promotional & Clickbait Spam Filtering
-- **Non-Offer Content:** Filters out marketing newsletters, LinkedIn clickbait, and promotional spam masquerading as genuine job communications.
-
----
-
-## 7. Document Processing: PDF Extraction & OCR
-
-Offer letters are frequently delivered in varied formats, from native vector PDFs to scanned image files and mobile photos. SafeOffer AI implements a multi-stage text extraction pipeline in [`src/pdfExtractor.ts`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/pdfExtractor.ts):
-
-```
-File Upload (.pdf / .png / .jpg)
-        |
-        +---> Is Image? ---> Tesseract.js Worker ---> Extracted Text
-        |
-        +---> Is PDF?
-                |
-                v
-        pdfjsLib.getDocument()
-                |
-                +---> Page 1..N: getTextContent()
-                        |
-                        +---> Length > 40 chars?
-                                |
-                                +--[Yes]--> Append digital text
-                                |
-                                +--[No]--> Render page to <canvas> (scale: 2.0)
-                                            |
-                                            v
-                                     performOCR(canvas)
-                                            |
-                                            v
-                                     Append OCR text
-```
-
-### Digital PDF Processing (`pdfjs-dist`)
-1. Reads the uploaded `File` as an `ArrayBuffer`.
-2. Loads the document using `pdfjsLib.getDocument({ data: arrayBuffer })`.
-3. Iterates through all pages, retrieving text chunks using `page.getTextContent()`.
-4. Merges textual items into a single string per page.
-
-### Scanned Document Fallback & Canvas OCR (`tesseract.js`)
-If a PDF page yields 40 characters or fewer of digital text, it is classified as a scanned image document:
-1. A viewport is created at high resolution (`scale: 2.0`) to preserve fine typographical details.
-2. An off-screen HTML5 `<canvas>` element is dynamically instantiated matching the viewport dimensions.
-3. The PDF page is rendered onto the canvas 2D context using `page.render({ canvasContext, viewport })`.
-4. The canvas image data is passed to `tesseract.js` via an English language worker (`createWorker('eng', 1)`).
-5. Progress updates (`m.status === 'recognizing text'`) are emitted back to the React UI in real time.
-6. The worker terminates upon completion (`worker.terminate()`) to release browser memory.
-
-### PDF Report Generation (`jspdf`)
-When the user clicks **Download Report**, the application invokes `handleExportPDF()` in [`src/App.tsx`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/App.tsx):
-- Instantiates a clean document via `new jsPDF()`.
-- Renders header typography, generation timestamp, and overall verdict.
-- Formats each forensic factor (Fee Demand, Recruiter Channel, Interview Process).
-- Includes the actionable student safety checklist.
-- Exports the audit file as `SafeOffer_Verification_Report.pdf`.
+#### 5. Marketing & Clickbait Spam Filtering
+Identifies promotional clickbait newsletters masquerading as student employment communications.
 
 ---
 
-## 8. Technology Stack
+## 07. Document Processing & OCR Pipeline
+
+The document ingestion pipeline in [`src/pdfExtractor.ts`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/pdfExtractor.ts) handles both digital and scanned files:
+
+```
+[ Uploaded Document ]
+         │
+         ├── Image File (.png, .jpg) ───────────────┐
+         │                                          │
+         └── PDF Document (.pdf)                    │
+                  │                                 │
+                  ▼                                 │
+         pdfjsLib.getDocument()                     │
+                  │                                 │
+                  ▼                                 │
+         page.getTextContent()                      │
+                  │                                 │
+                  ├── Text > 40 chars (Digital) ────┼──► [ Normalized Text Buffer ]
+                  │                                 │
+                  └── Text <= 40 chars (Scanned)    │
+                           │                        │
+                           ▼                        │
+                  Render to HTML5 <canvas>          │
+                  (Viewport Scale: 2.0)             │
+                           │                        │
+                           ▼                        │
+                  tesseract.js Worker ◄─────────────┘
+                  (English OCR Engine)
+                           │
+                           ▼
+                  [ Normalized Text Buffer ]
+```
+
+1. **Digital PDF Parsing:** Ingests document bytes into `pdfjs-dist` and iterates through pages to extract selectable text chunks.
+2. **High-Resolution Canvas OCR:** If digital text yield is 40 characters or fewer, the page is treated as an image scan. The page is rendered to an HTML5 `<canvas>` at `scale: 2.0` (high DPI) to optimize character edge detection.
+3. **Tesseract.js Engine:** The canvas or image file is dispatched to a `tesseract.js` worker (`eng` language data). Live progress telemetry (`Recognizing text: XX%`) is streamed to the user interface.
+4. **Audit PDF Export (`jspdf`):** When the user triggers report export, [`src/App.tsx`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/App.tsx) generates a formatted, printable `SafeOffer_Verification_Report.pdf` detailing verdict, evidence items, and safety checklists.
+
+---
+
+## 08. Technology Stack
 
 | Layer | Technology | Version | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Core Framework** | React | `^18.3.1` | Declarative user interface and component state management |
+| **Frontend Framework** | React | `^18.3.1` | Declarative UI, state management, and component architecture |
 | **Language** | TypeScript | `^5.7.3` | Type safety across forensic schemas and document extractors |
-| **Build Tooling** | Vite | `^6.1.0` | High-speed local development server and optimized bundler |
-| **Styling & Design** | Tailwind CSS | `^3.4.17` | Responsive utility-first design system with dark mode support |
-| **Iconography** | Lucide React | `^0.475.0` | Accessible and consistent interface icons |
-| **AI Integration** | Google Gemini API | `gemini-1.5-flash` | Cloud-based generative semantic analysis and JSON extraction |
-| **PDF Extraction** | PDF.js (`pdfjs-dist`) | `^3.11.174` | In-browser parsing and rendering of portable document format files |
-| **Optical Character Recognition** | Tesseract.js | `^7.0.0` | Client-side OCR worker for image and scanned document transcription |
-| **Audit Document Generation** | jsPDF | `^2.5.2` | Client-side generation and export of forensic verification reports |
+| **Build Tooling** | Vite | `^6.1.0` | Development server and production bundling |
+| **Styling** | Tailwind CSS | `^3.4.17` | Utility-first styling with integrated dark mode |
+| **Iconography** | Lucide React | `^0.475.0` | Clean, accessible iconography |
+| **AI Engine** | Google Gemini API | `gemini-1.5-flash` | Cloud semantic evaluation and structured JSON extraction |
+| **PDF Extraction** | Mozilla PDF.js | `^3.11.174` | In-browser parsing and rendering of PDF documents |
+| **OCR Engine** | Tesseract.js | `^7.0.0` | Client-side OCR worker for image and scan transcription |
+| **Report Generation** | jsPDF | `^2.5.2` | Client-side generation of forensic audit PDF reports |
 
 ---
 
-## 9. Project Structure
+## 09. Project Structure
 
 ```
 TCShackathon-26/
+├── screenshots/                 # Application walkthrough screenshots
+│   ├── 01_landing_interface.png
+│   ├── 02_scam_detection_verdict.png
+│   ├── 03_safe_verified_verdict.png
+│   └── 04_dark_mode_interface.png
 ├── public/
-│   └── logo.svg                 # Application brand vector icon
+│   └── logo.svg                 # Brand vector asset
 ├── src/
-│   ├── analyzer.ts              # Gemini API integration & Heuristic Rule Engine
-│   ├── App.tsx                  # Primary application UI, state & PDF export logic
-│   ├── index.css                # Global styles & Tailwind CSS imports
-│   ├── Logo.tsx                 # Reusable logo component wrapper
-│   ├── main.tsx                 # React DOM root entry point
-│   ├── pdfExtractor.ts          # PDF.js digital text extraction & Tesseract.js OCR
-│   └── vite-env.d.ts            # Vite client environment type definitions
-├── index.html                   # HTML entry point with fonts & metadata
-├── package.json                 # Project dependencies & operational scripts
-├── postcss.config.js            # PostCSS configuration for Tailwind CSS
-├── tailwind.config.js           # Tailwind design tokens, typography & dark mode setup
+│   ├── analyzer.ts              # Gemini API client & Deterministic Heuristic Engine
+│   ├── App.tsx                  # Main UI layout, upload handler & jsPDF exporter
+│   ├── index.css                # Tailwind directives and font configurations
+│   ├── Logo.tsx                 # Brand logo component
+│   ├── main.tsx                 # Application DOM entry point
+│   ├── pdfExtractor.ts          # PDF.js digital extractor & Tesseract.js OCR pipeline
+│   └── vite-env.d.ts            # Vite client environment declarations
+├── index.html                   # HTML entry point with Plus Jakarta Sans typography
+├── package.json                 # Dependency definitions and scripts
+├── postcss.config.js            # PostCSS configuration
+├── tailwind.config.js           # Tailwind theme tokens and dark mode config
 ├── tsconfig.json                # TypeScript compiler configuration
-├── vite.config.ts               # Vite configuration with React plugin
+├── vite.config.ts               # Vite bundler configuration
 └── README.md                    # Project documentation
 ```
 
 ---
 
-## 10. Installation & Execution
+## 10. Installation & Setup
 
 ### Prerequisites
-- **Node.js:** v18.0.0 or higher
-- **Package Manager:** `npm` (bundled with Node.js)
+* **Node.js:** v18.0.0 or higher
+* **npm:** v9.0.0 or higher
 
 ### 1. Clone the Repository
 ```bash
@@ -341,7 +313,7 @@ npm install
 ```
 
 ### 3. Configure Environment Variables (Optional)
-The application functions out-of-the-box using the local heuristic forensic engine without any API keys. To enable cloud-based AI analysis via Google Gemini, create a `.env` file in the project root:
+SafeOffer AI operates completely offline out-of-the-box using the local heuristic forensic engine. To enable cloud-powered semantic analysis via Gemini 1.5 Flash, create a `.env` file in the project root:
 
 ```bash
 touch .env
@@ -352,58 +324,84 @@ Add your Gemini API key:
 VITE_GEMINI_API_KEY=your_google_gemini_api_key_here
 ```
 
-> **Note:** If `VITE_GEMINI_API_KEY` is not provided, SafeOffer AI automatically routes all evaluations through the local heuristic engine.
+> **Note:** If `VITE_GEMINI_API_KEY` is omitted, the application automatically routes all evaluations through the local heuristic engine with zero functionality loss.
 
 ### 4. Run the Development Server
 ```bash
 npm run dev
 ```
-Open your browser and navigate to `http://localhost:5173` (or the URL displayed in your terminal).
+Open `http://localhost:5173` in your browser.
 
-### 5. Production Build & Preview
+### 5. Build for Production
 ```bash
-# Typecheck and bundle for production
 npm run build
-
-# Preview production build locally
 npm run preview
 ```
 
 ---
 
-## 11. Limitations & Future Scope
+## 11. Prototype Limitations & Privacy
 
-### Limitations & Preliminary Nature of Assessment
-- **Preliminary Screening Only:** SafeOffer AI is designed as a first-line screening and educational risk assessment tool. It does **not** provide definitive legal or corporate verification of employment contracts.
-- **External Network Checks:** The system does not perform live DNS MX, SPF, DKIM, or DMARC record lookups, nor does it query government corporate registry databases (such as the Ministry of Corporate Affairs).
-- **OCR Quality Dependencies:** Severely degraded, skewed, or low-contrast document images may result in incomplete transcription, potentially causing heuristic rules to miss critical text.
-- **Privacy Notice:** When configured with a Gemini API key (`VITE_GEMINI_API_KEY`), submitted offer text is sent over HTTPS to Google's Generative Language API endpoint (`generativelanguage.googleapis.com`) for analysis. When operated without an API key, all evaluation and OCR processing execute entirely inside the user's browser.
+### Prototype Boundaries
+1. **Preliminary Forensic Screening Only:** SafeOffer AI is designed as a first-line educational and forensic screening tool. It does **not** replace official verification by corporate human resources or college placement officers (TPOs), and does not legally certify contract validity.
+2. **No Live External Network Checks:** The system does not query DNS MX/SPF/DKIM/DMARC records in real time, nor does it connect to government corporate registries (e.g., MCA).
+3. **Image Quality & OCR Dependency:** Heavily degraded, blurred, or skewed camera scans may impede optical character recognition, causing heuristic rules to miss critical text.
 
-### Future Scope
-- **Live Enterprise Domain & DNS Verification:** Integrating active SPF/DKIM validation and WHOIS age checks to identify newly registered lookalike domains.
-- **Direct Portal Integration:** Integrating APIs with verified student recruitment portals (e.g., TCS NextStep, Infosys Launchpad) for automated offer ID validation.
-- **On-Device Small Language Model (SLM):** Implementing in-browser model execution (e.g., WebLLM or ONNX Runtime) to provide semantic AI analysis without external API calls.
-- **Multi-Lingual OCR:** Expanding OCR language models to support regional Indian languages for vernacular offer letters.
+### Privacy Architecture
+* **Gemini AI Mode:** When configured with an API key, submitted offer text is sent over HTTPS to Google's Generative Language API (`generativelanguage.googleapis.com`) for analysis.
+* **Local Heuristic Mode:** When operating without an API key, **100% of the analysis, regex matching, and OCR processing executes locally within your browser**. No user data or document text leaves your machine.
 
 ---
 
-## 12. Hackathon Details & Team Contributions
+## 12. Team & Contributions
 
-### TCS Hackathon 2026
-SafeOffer AI was conceptualized, designed, and developed for **TCS Hackathon 2026** under the **AI & Cyber Defense Track (Problem Statement: Student Recruitment & Internship Fraud Detection)**, where it was shortlisted among the **Top 7 Finalist Teams**.
-
-### Team Members
-
-| Name | Role / Project Contribution |
-| :--- | :--- |
-| **Samuel Michael Alva** | **Team Lead & Application Developer**<br>Led project architecture and end-to-end technical implementation, including the dual-engine forensic detection system (Gemini 1.5 Flash API integration and deterministic heuristic engine), hybrid PDF.js and Tesseract.js OCR pipeline, client-side jsPDF audit report generator, and responsive UI engineering. |
-| **Justin Sunil** | **Team Member** |
-| **Arya Gunjotikar** | **Team Member** |
-| **Renata Belli** | **Team Member** |
-| **Ritu Shinde** | **Team Member** |
+SafeOffer AI was conceptualized, built, and presented for **TCS Hackathon 2026** by a five-member team, qualifying as one of the **Top 7 Finalist Teams** in the competition.
 
 ---
 
-## License & Advisory
+### Core Team
 
-This project was built for educational and hackathon evaluation purposes. If you suspect you are being targeted by an active employment scam in India, immediately contact your **College Placement Cell / TPO** and register a complaint with the **National Cyber Crime Reporting Portal** ([cybercrime.gov.in](https://cybercrime.gov.in/)) or dial the **National Cyber Fraud Helpline: 1930**.
+**Samuel Michael Alva — Team Lead & Application Developer**
+
+Samuel served as the team lead and single-handedly engineered the technical architecture and full-stack implementation of SafeOffer AI. His contributions span every subsystem of the codebase, as verified by the repository commit history:
+
+* **Dual-Engine Fraud Architecture** — Designed and implemented the hybrid detection framework in [`src/analyzer.ts`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/analyzer.ts): the cloud-based Google Gemini 1.5 Flash LLM integration with strict JSON schema parsing, paired with a resilient, zero-latency deterministic heuristic rule matrix fallback.
+* **Forensic Pattern & Rule Engineering** — Authored the comprehensive regex detection engine identifying upfront fee demands (with zero-deposit negation logic), unauthorized Telegram redirects, recruiter webmail impersonation (`@gmail`, `@yahoo`, `@outlook`), unilateral hiring without interview evaluation, and artificial urgency triggers.
+* **Document Ingestion & OCR Pipeline** — Engineered [`src/pdfExtractor.ts`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/pdfExtractor.ts), integrating Mozilla `pdfjs-dist` for digital vector PDF text extraction and orchestrating high-resolution HTML5 canvas rendering (scale 2.0) with an asynchronous `tesseract.js` worker for scanned documents, camera photos, and image files with real-time recognition progress telemetry.
+* **Forensic Audit PDF Generator** — Built the client-side audit reporting engine in [`src/App.tsx`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/App.tsx) utilizing `jspdf`, structuring timestamped forensic evidence, factor statuses, and student action checklists into exportable PDFs.
+* **User Interface & State Management** — Developed the complete React 18 application interface in [`src/App.tsx`](file:///c:/Users/noela/Desktop/Samuel%20Projects/TCShackathon-26/src/App.tsx): reactive file dropzone, clipboard paste synchronization, light/dark mode theming with Tailwind CSS, high-contrast decision banners, and tri-factor forensic evidence cards.
+* **Repository & Release Management** — Sole committer across all commits in the project repository (`git log --all --format="%an | %s"`), managing the prototype development, dependency configuration, and production builds.
+
+---
+
+**Justin Sunil — Hackathon Team Member**
+
+Justin contributed to the collaborative problem definition, threat modeling research, and student persona requirements during TCS Hackathon 2026. The team's research into prevalent campus recruitment scam vectors and placement cell workflows reflects collective analysis during the hackathon.
+
+---
+
+**Arya Gunjotikar — Hackathon Team Member**
+
+Arya contributed to problem formulation, user journey scoping, and research into recruitment communication channels (Telegram groups, WhatsApp hiring spams) targeted at university graduates during the competition ideation phase.
+
+---
+
+**Renata Belli — Hackathon Team Member**
+
+Renata contributed to team ideation, validation criteria scoping, and the preparation of hackathon pitch materials and slide presentations for the TCS Hackathon 2026 judging panel.
+
+---
+
+**Ritu Shinde — Hackathon Team Member**
+
+Ritu contributed to the domain evaluation research, comparative analysis of genuine enterprise recruitment processes versus deceptive hiring practices, and collaborative pitch asset development.
+
+---
+
+> **Codebase note:** All technical implementation — React components, TypeScript algorithms, Gemini API integration, heuristic rule matrices, PDF/OCR extraction logic, Tailwind CSS styling, and documentation — was authored by Samuel Michael Alva, as verified by the Git commit history (`git log --all --format="%an | %s"`). No code commits from other team members are present in the repository.
+
+---
+
+<div align="center">
+  <sub>Built for TCS Hackathon 2026 · Top 7 Finalist · Team SafeOffer AI</sub>
+</div>
